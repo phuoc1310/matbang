@@ -1,6 +1,3 @@
-// ================= GLOBAL STATE =================
-// TODO: Sau này state này có thể sync với backend hoặc Redis
-
 window.rawData = window.rawData || [];
 window.filteredData = window.filteredData || [];
 window.currentPage = window.currentPage || 1;
