@@ -53,30 +53,38 @@
         class="sticky top-0 z-50 bg-surface-light/95 dark:bg-surface-dark/95 backdrop-blur-md border-b border-border-light dark:border-border-dark">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex items-center justify-between h-16">
-                <a href="Trangchu.html" class="flex items-center gap-2">
+                <div class="flex items-center gap-2">
                     <div class="size-8 text-primary flex items-center justify-center">
                         <span class="material-symbols-outlined text-3xl">domain</span>
                     </div>
                     <h2 class="text-text-main-light dark:text-text-main-dark text-xl font-bold tracking-tight">SpaceRent
                     </h2>
-                </a>
+                </div>
                 <nav class="hidden md:flex items-center gap-8">
-                    <a class="text-sm font-semibold hover:text-primary transition-colors" href="timkiem.html">Thuê mặt bằng</a>
-                    <a class="text-sm font-semibold hover:text-primary transition-colors" href="timkiem.html">Cho thuê</a>
-                    <a class="text-sm font-semibold hover:text-primary transition-colors" href="timkiem.html">Dự án</a>
+                    <a class="text-sm font-semibold hover:text-primary transition-colors" href="#">Thuê mặt bằng</a>
+                    <a class="text-sm font-semibold hover:text-primary transition-colors" href="#">Cho thuê</a>
+                    <a class="text-sm font-semibold hover:text-primary transition-colors" href="#">Dự án</a>
                     <a class="text-sm font-semibold hover:text-primary transition-colors" href="#">Tin tức</a>
                 </nav>
-                <div class="flex gap-3">
-                    <a id="auth-link" href="dangnhap.html"
+                <div id="guest-actions" class="flex gap-3">
+                    <button onclick="window.location.href='dangnhap.html'"
                         class="hidden sm:flex h-9 items-center justify-center px-4 rounded-lg bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-bold transition-colors text-text-main-light dark:text-text-main-dark">
                         Đăng nhập
-                    </a>
-                    <a href="timkiem.html"
+                    </button>
+                    <button
                         class="flex h-9 items-center justify-center gap-2 px-4 rounded-lg bg-primary hover:bg-primary-dark text-white text-sm font-bold transition-colors shadow-sm">
                         <span class="material-symbols-outlined text-[18px]">add_circle</span>
                         <span class="hidden sm:inline">Đăng tin miễn phí</span>
-                    </a>
+                    </button>
                 </div>
+                <div id="user-actions" class="hidden items-center gap-3">
+                    <span id="user-name" class="font-semibold text-sm"></span>
+
+                    <button id="btn-logout" class="h-9 px-4 rounded-lg border text-sm font-bold">
+                        Đăng xuất
+                    </button>
+                </div>
+
             </div>
         </div>
     </header>
@@ -181,7 +189,7 @@
             <h2 class="text-2xl font-bold mb-8 text-text-main-light dark:text-text-main-dark">Khám phá theo loại hình
             </h2>
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <a class="group relative overflow-hidden rounded-2xl aspect-[4/3] cursor-pointer" href="timkiem.html?type=Văn phòng">
+                <a class="group relative overflow-hidden rounded-2xl aspect-[4/3] cursor-pointer" href="#">
                     <img alt="Bright modern open plan office space"
                         class="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
                         data-alt="Bright modern open plan office space"
@@ -192,7 +200,7 @@
                         <p class="text-sm opacity-90">1,240+ địa điểm</p>
                     </div>
                 </a>
-                <a class="group relative overflow-hidden rounded-2xl aspect-[4/3] cursor-pointer" href="timkiem.html?type=Cửa hàng">
+                <a class="group relative overflow-hidden rounded-2xl aspect-[4/3] cursor-pointer" href="#">
                     <img alt="Busy retail store front with customers"
                         class="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
                         data-alt="Busy retail store front with customers"
@@ -203,7 +211,7 @@
                         <p class="text-sm opacity-90">850+ địa điểm</p>
                     </div>
                 </a>
-                <a class="group relative overflow-hidden rounded-2xl aspect-[4/3] cursor-pointer" href="timkiem.html?type=Kho xưởng">
+                <a class="group relative overflow-hidden rounded-2xl aspect-[4/3] cursor-pointer" href="#">
                     <img alt="Spacious industrial warehouse interior"
                         class="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
                         data-alt="Spacious industrial warehouse interior"
@@ -214,7 +222,7 @@
                         <p class="text-sm opacity-90">420+ địa điểm</p>
                     </div>
                 </a>
-                <a class="group relative overflow-hidden rounded-2xl aspect-[4/3] cursor-pointer" href="timkiem.html">
+                <a class="group relative overflow-hidden rounded-2xl aspect-[4/3] cursor-pointer" href="#">
                     <img alt="Creative coworking space with people working"
                         class="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
                         data-alt="Creative coworking space with people working"
@@ -234,7 +242,7 @@
                     <p class="text-text-sub-light dark:text-text-sub-dark mt-1">Được đánh giá cao bởi cộng đồng người
                         thuê</p>
                 </div>
-                <a class="text-primary hover:text-primary-dark font-bold text-sm flex items-center gap-1" href="timkiem.html">
+                <a class="text-primary hover:text-primary-dark font-bold text-sm flex items-center gap-1" href="#">
                     Xem tất cả <span class="material-symbols-outlined text-sm">arrow_forward</span>
                 </a>
             </div>
@@ -293,9 +301,9 @@
                         Nền tảng kết nối không gian kinh doanh hàng đầu Việt Nam.
                     </p>
                     <div class="flex gap-4">
-                        <a class="text-text-sub-light hover:text-primary transition-colors" href="timkiem.html"><span
+                        <a class="text-text-sub-light hover:text-primary transition-colors" href="#"><span
                                 class="material-symbols-outlined">social_leaderboard</span></a>
-                        <a class="text-text-sub-light hover:text-primary transition-colors" href="mailto:contact@spacerent.vn"><span
+                        <a class="text-text-sub-light hover:text-primary transition-colors" href="#"><span
                                 class="material-symbols-outlined">mail</span></a>
                     </div>
                 </div>
@@ -310,9 +318,9 @@
                 <div>
                     <h4 class="font-bold mb-4">Dành cho khách hàng</h4>
                     <ul class="space-y-2 text-sm text-text-sub-light dark:text-text-sub-dark">
-                        <li><a class="hover:text-primary" href="timkiem.html?type=Văn phòng">Tìm văn phòng</a></li>
-                        <li><a class="hover:text-primary" href="timkiem.html?type=Cửa hàng">Tìm cửa hàng</a></li>
-                        <li><a class="hover:text-primary" href="timkiem.html">Bảng giá dịch vụ</a></li>
+                        <li><a class="hover:text-primary" href="#">Tìm văn phòng</a></li>
+                        <li><a class="hover:text-primary" href="#">Tìm cửa hàng</a></li>
+                        <li><a class="hover:text-primary" href="#">Bảng giá dịch vụ</a></li>
                     </ul>
                 </div>
                 <div>
@@ -336,43 +344,9 @@
             </div>
         </div>
     </footer>
-    <script src="asset/js/api.js"></script>
-    <script src="asset/js/render.js"></script>
-    <script src="asset/js/filter.js"></script>
-    <script src="asset/js/main.js"></script>
-    <script src="asset/js/auth.js"></script>
+    <script type="module" src="./asset/js/main.js"></script>
+    <script type="module" src="./asset/js/trangchu.js"></script>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", async () => {
-            await fetchData();
-
-            window.PAGE_SIZE = 6;
-            window.currentPage = 1;
-
-            renderPage();
-        });
-
-        document.addEventListener("DOMContentLoaded", () => {
-            // Nút tìm kiếm chính
-            const searchBtn = document.querySelector("button[type='button'].bg-primary"); // Selector nút Tìm
-            const input = document.querySelector("input[placeholder*='Nhập quận']"); // Selector ô input
-
-            if (searchBtn && input) {
-                searchBtn.addEventListener("click", () => {
-                    const keyword = input.value.trim();
-                    // Chuyển hướng sang trang timkiem.html kèm keyword
-                    window.location.href = `timkiem.html?keyword=${encodeURIComponent(keyword)}`;
-                });
-            }
-
-            // Cập nhật link Đăng nhập/Tài khoản
-            const authLink = document.getElementById("auth-link");
-            if (authLink && typeof isLoggedIn === "function" && isLoggedIn()) {
-                authLink.href = "taikhoan.html";
-                authLink.textContent = "Tài khoản";
-            }
-        });
-    </script>
 
 </body>
 
