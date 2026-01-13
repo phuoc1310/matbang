@@ -7,9 +7,13 @@ function parseMoney(v) {
 }
 
 function collectFilterState() {
+  const state = window.__SEARCH_STATE__ || {};
+
   return {
-    keyword: normalizeText(document.getElementById("search")?.value || ""),
-    city: document.getElementById("citySelect")?.value || "",
+    keyword: normalizeText(
+      document.getElementById("search")?.value || state.keyword || ""
+    ),
+    city: state.city || "",
     minPrice: parseMoney(document.getElementById("minPrice")?.value),
     maxPrice: parseMoney(document.getElementById("maxPrice")?.value) || Infinity,
     areas: Array.from(
@@ -17,6 +21,7 @@ function collectFilterState() {
     ).map(cb => cb.dataset.area),
   };
 }
+
 
 function applyFilter() {
   if (!Array.isArray(window.rawData)) return;
@@ -28,6 +33,19 @@ function applyFilter() {
   logEventToN8N("SEARCH", f);
 
   window.filteredData = window.rawData.filter(item => {
+    if (f.city) {
+      const region = normalizeText(item.region || "");
+
+      const cityMap = {
+        hcm: ["ho chi minh", "tp ho chi minh", "hcm","TP.HCM"],
+        hn: ["ha noi"],
+        dn: ["da nang"],
+        bd: ["binh duong"],
+      };
+
+      const allow = cityMap[f.city] || [];
+      if (!allow.some(k => region.includes(k))) return false;
+    }
     const text = normalizeText(`
       ${item.title} ${item.street} ${item.ward} ${item.district} ${item.region}
     `);
@@ -54,3 +72,13 @@ function applyFilter() {
   window.currentPage = 1;
   renderPage?.();
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+  const citySelect = document.getElementById("citySelect");
+  if (!citySelect) return;
+
+  citySelect.addEventListener("change", () => {
+    window.currentPage = 1;
+    applyFilter();
+  });
+});

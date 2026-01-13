@@ -342,37 +342,41 @@
       </div>
     </div>
   </main>
-  <script src="asset/js/api.js"></script>
-  <script src="asset/js/state.js"></script>
-  <script src="asset/js/render.js"></script>
-  <script src="asset/js/filter.js"></script>
-  <script src="asset/js/main.js"></script>
+ <!-- CHỈ 1 dòng này ở cuối body -->
+<script type="module" src="./asset/js/main.js"></script>
+
 
 </body>
 <script>
   document.addEventListener("DOMContentLoaded", () => {
     const params = new URLSearchParams(window.location.search);
-    const keyword = params.get("keyword");
 
-    const regionEl = document.getElementById("bc-region");
-    const districtEl = document.getElementById("bc-district");
+    const keyword = params.get("keyword") || "";
+    const city = params.get("city") || "";
 
-    if (!keyword) return;
+    // ====== SET SEARCH INPUT ======
+    const searchInput = document.getElementById("search");
+    if (searchInput) searchInput.value = keyword;
 
-    const decoded = decodeURIComponent(keyword).trim();
+    // ====== MAP CITY CODE → TEXT ======
+    const cityLabelMap = {
+      hcm: "TP Hồ Chí Minh",
+      hn: "Hà Nội",
+      dn: "Đà Nẵng",
+      bd: "Bình Dương"
+    };
 
-    // Nếu có dấu phẩy → "Quận 1, TP Hồ Chí Minh"
-    if (decoded.includes(",")) {
-      const parts = decoded.split(",").map(s => s.trim());
-      if (districtEl) districtEl.textContent = parts[0];
-      if (regionEl) regionEl.textContent = parts[1];
-    }
-    // Nếu chỉ có 1 từ → "Hà Nội", "Tây Hồ"
-    else {
-      if (districtEl) districtEl.textContent = "";
-      if (regionEl) regionEl.textContent = decoded;
-    }
+    // ====== BREADCRUMB ======
+    const bcRegion = document.getElementById("bc-region");
+    if (bcRegion) bcRegion.textContent = cityLabelMap[city] || "";
+
+    // ====== SAVE STATE CHO FILTER ======
+    window.__SEARCH_STATE__ = {
+      keyword,
+      city
+    };
   });
 </script>
+
 
 </html>
