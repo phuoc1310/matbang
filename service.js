@@ -1,15 +1,13 @@
 // service.js
+import "dotenv/config";
 import express from "express";
-
 import cors from "cors";
 
 const app = express();
-
 const PORT = 3033;
 
 app.use(cors());
 app.use(express.json());
-app.use(express.static("public"));
 
 app.get("/api/ads", async (req, res) => {
   try {
@@ -42,6 +40,33 @@ app.get("/api/ads", async (req, res) => {
   }
 });
 
+app.get("/api/ads/:id", async (req, res) => {
+  const id = req.params.id;
+
+  const url = `https://gateway.chotot.com/v1/public/ad-listing?ad_id=${id}`;
+
+  try {
+    const r = await fetch(url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0",
+        Accept: "application/json",
+      },
+    });
+
+    const json = await r.json();
+    const item = json.ads?.[0];
+
+    if (!item) return res.status(404).json({ error: "Not found" });
+
+    res.json(item);
+  } catch (e) {
+    res.status(500).json({ error: "Fetch detail failed" });
+  }
+});
+
+
+app.use(express.static("public"));
+
 app.listen(PORT, () => {
-  console.log(`✅ Server running at http://localhost:${PORT}/trangchu.html`);
+  console.log(`Server running at http://localhost:${PORT}/trangchu.html`);
 });

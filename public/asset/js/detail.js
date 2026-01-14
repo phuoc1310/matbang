@@ -1,104 +1,136 @@
-import { fetchAllData } from "./api.js";
+import { fetchData } from "./api.js";
 import { renderImages } from "./render.js";
-/** Lấy id từ URL: chitiet.html?id=... */
+
+let map;
+let currentItem = null;
+
+/** Lấy id từ URL */
 function getIdFromUrl() {
   return new URLSearchParams(window.location.search).get("id");
 }
 
-/** Format địa chỉ gọn */
-function formatLocation(item) {
-  const parts = [item.street, item.ward, item.district, item.region].filter(Boolean);
-  return parts.join(", ");
+/** Lấy vị trí user */
+function getUserLocation() {
+  return new Promise((resolve, reject) => {
+    if (!navigator.geolocation) reject("No GPS");
+    navigator.geolocation.getCurrentPosition(
+      (pos) =>
+        resolve({
+          lat: pos.coords.latitude,
+          lng: pos.coords.longitude
+        }),
+      reject,
+      { enableHighAccuracy: true }
+    );
+  });
 }
 
-/** Render sao rating */
-function renderStars(rating) {
-  if (rating == null || Number.isNaN(rating)) return "Chưa có đánh giá";
-  const r = Math.max(0, Math.min(5, Math.round(rating)));
-  return "★".repeat(r) + "☆".repeat(5 - r) + ` (${rating.toFixed(1)})`;
+/** Gọi OSRM */
+async function getRoute(from, to) {
+  const url =
+    `https://router.project-osrm.org/route/v1/driving/` +
+    `${from.lng},${from.lat};${to.lng},${to.lat}` +
+    `?overview=full&geometries=geojson`;
+
+  const res = await fetch(url);
+  const data = await res.json();
+
+  if (!data.routes || !data.routes.length) {
+    throw new Error("No route");
+  }
+
+  return data.routes[0].geometry;
 }
 
-/** MOCK AI: demo luồng, thay bằng Dify API thật sau */
-async function askAIWithContext(item) {
-  const context = {
-    title: item.title,
-    price_string: item.price_string,
-    area_m2: item.area_m2,
-    location: formatLocation(item),
-    category: item.category,
-    seller: item.seller,
-    rating: item.rating,
-  };
+/** Vẽ route */
+function drawRoute(geometry) {
+  const geojson = { type: "Feature", geometry };
 
-  // giả lập thời gian gọi AI
-  await new Promise((r) => setTimeout(r, 900));
+  if (map.getSource("route")) {
+    map.getSource("route").setData(geojson);
+    return;
+  }
 
-  // trả kết quả demo (đủ để thuyết trình + chạy UI)
-  return `AI phân tích nhanh:
-- Vị trí: ${context.location || "Không rõ"}.
-- Giá: ${context.price_string || "Liên hệ"}; diện tích: ${context.area_m2 || "—"} m².
-- Gợi ý: phù hợp nếu bạn cần mặt bằng ${context.category || "kinh doanh"} và ưu tiên khu vực này. 
-Lưu ý: kiểm tra pháp lý + quy hoạch trước khi cọc.`;
+  map.addSource("route", { type: "geojson", data: geojson });
+
+  map.addLayer({
+    id: "route-line",
+    type: "line",
+    source: "route",
+    paint: {
+      "line-color": "#2563eb",
+      "line-width": 5
+    }
+  });
 }
 
+/** MAIN */
 document.addEventListener("DOMContentLoaded", async () => {
   const id = getIdFromUrl();
-  if (!id) {
-    console.warn("Missing id in URL");
-    return;
-  }
+  if (!id) return;
 
-  // 1) Load data
-  await fetchAllData(10);
+  await fetchData(5); // fetch nhiều page cho chắc
 
-  // 2) Find item
-  const item = (window.rawData || []).find((x) => String(x.id) === String(id));
+  const item = (window.rawData || []).find(
+    (x) => String(x.id) === String(id)
+  );
   if (!item) {
-    console.warn("Item not found for id:", id);
+    alert("Không tìm thấy dữ liệu mặt bằng");
     return;
   }
-    renderImages(item);
 
-  // 3) Bơm các phần bên trái nếu bạn có id tương ứng (không bắt buộc)
-  // Nếu bạn đã gắn id="title", id="location", id="price", id="area", id="mainImage" thì nó tự fill
-  const elTitle = document.getElementById("title");
-  if (elTitle) elTitle.textContent = item.title || "";
+  currentItem = item;
 
-  const elLoc = document.getElementById("location");
-  if (elLoc) elLoc.textContent = formatLocation(item);
+  renderImages(item);
 
-  const elPrice = document.getElementById("price");
-  if (elPrice) elPrice.textContent = item.price_string || "Liên hệ";
+  document.getElementById("title").textContent = item.title || "";
+  document.getElementById("location").textContent =
+    [item.street, item.ward, item.district, item.region].filter(Boolean).join(", ");
+  document.getElementById("price").textContent = item.price_string || "Liên hệ";
+  document.getElementById("area").textContent =
+    item.area_m2 ? `${item.area_m2} m²` : "—";
 
-  const elArea = document.getElementById("area");
-  if (elArea) elArea.textContent = item.area_m2 ? `${item.area_m2} m²` : "—";
+  map = new maplibregl.Map({
+    container: "vietmap",
+    style: "https://tiles.basemaps.cartocdn.com/gl/positron-gl-style/style.json",
+    center: [item.lng, item.lat],
+    zoom: 15
+  });
 
-  const elMainImg = document.getElementById("mainImage");
-  if (elMainImg && item.image) {
-    elMainImg.style.backgroundImage = `url('${item.image}')`;
-  }
+  new maplibregl.Marker({ color: "#2563eb" })
+    .setLngLat([item.lng, item.lat])
+    .addTo(map);
 
-  // ✅ 4) Bơm dữ liệu vào RIGHT block của bạn (GIỮ NGUYÊN HTML)
-  const sellerEl = document.getElementById("detail-seller");
-  if (sellerEl) sellerEl.textContent = item.seller || "Chủ mặt bằng (ẩn danh)";
+  map.addControl(new maplibregl.NavigationControl(), "top-right");
 
-  const ratingEl = document.getElementById("detail-rating");
-  if (ratingEl) ratingEl.textContent = renderStars(item.rating);
-
-  // ✅ 5) Cho inline onclick hoạt động trong ES module
-  // Giữ nguyên: onclick="askAIAdvisor()"
-  window.askAIAdvisor = async function () {
-    const out = document.getElementById("ai-result");
-    if (!out) return;
-
-    out.textContent = "AI đang phân tích…";
-
-    try {
-      const ans = await askAIWithContext(item);
-      out.textContent = ans;
-    } catch (e) {
-      console.error(e);
-      out.textContent = "AI lỗi nhẹ. Thử lại sau (hoặc do bạn chưa nối Dify).";
-    }
-  };
+  // enable nút
+  const btn = document.getElementById("btnRoute");
+  btn.disabled = false;
+  btn.classList.remove("opacity-50");
 });
+
+/** BUTTON */
+window.routeToListing = async function () {
+  try {
+    if (!map || !currentItem) {
+      alert("Map chưa sẵn sàng");
+      return;
+    }
+
+    const pos = await getUserLocation();
+
+    new maplibregl.Marker({ color: "#16a34a" })
+      .setLngLat([pos.lng, pos.lat])
+      .addTo(map);
+
+    const geometry = await getRoute(
+      { lat: pos.lat, lng: pos.lng },
+      { lat: currentItem.lat, lng: currentItem.lng }
+    );
+
+    drawRoute(geometry);
+  } catch (e) {
+    console.error(e);
+    alert("Không lấy được vị trí hoặc không tìm được đường");
+  }
+};

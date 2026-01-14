@@ -8,6 +8,15 @@ const guestUI = document.getElementById("guest-actions");
 const userUI  = document.getElementById("user-actions");
 const userName = document.getElementById("user-name");
 const btnLogout = document.getElementById("btn-logout");
+import { fetchAllData } from "./api.js";
+import { renderPage } from "./render.js";
+
+document.addEventListener("DOMContentLoaded", async () => {
+  await fetchAllData(10);
+  window.PAGE_SIZE = 18;
+  window.currentPage = 1;
+  renderPage();
+});
 
 onAuthStateChanged(auth, async (user) => {
   if (user) {
