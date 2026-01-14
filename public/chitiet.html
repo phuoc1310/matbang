@@ -6,6 +6,10 @@
   <meta content="width=device-width, initial-scale=1.0" name="viewport" />
   <title>Trang chi tiết - PropData</title>
 
+  <!-- MapLibre GL JS -->
+  <link href="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.css" rel="stylesheet" />
+  <script src="https://unpkg.com/maplibre-gl@3.6.2/dist/maplibre-gl.js"></script>
+
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -163,13 +167,19 @@
 
         <!-- Map placeholder -->
         <div class="mb-10">
-          <h3 class="text-xl font-bold mb-4 border-l-4 border-primary pl-4">Vị trí trên bản đồ</h3>
-          <div class="w-full h-[350px] rounded-xl overflow-hidden border border-gray-200 relative group bg-slate-200">
-            <div class="absolute inset-0 flex items-center justify-center text-gray-600 font-bold">
-              (Demo) Map sẽ tích hợp theo lat/lng sau
-            </div>
+          <h3 class="text-xl font-bold mb-4 border-l-4 border-primary pl-4">
+            Vị trí trên bản đồ
+            <button id="btnRoute" onclick="routeToListing()"
+              class="w-full bg-green-600 text-white py-3 rounded-lg font-bold mt-2">
+              📍 Chỉ đường tới đây
+            </button>
+
+          </h3>
+
+          <div id="vietmap" class="w-full h-[350px] rounded-xl overflow-hidden border border-gray-200">
           </div>
         </div>
+
       </div>
 
       <!-- RIGHT -->
@@ -287,8 +297,11 @@ document.addEventListener("DOMContentLoaded", async () => {
           "⚠️ AI chưa được cấu hình (demo tích hợp n8n + Dify).";
       }
     }
+  
+
+
   </script>
-  <script type="module" src="./asset/js/detail.js"></script>
+
 </body>
 
 </html>

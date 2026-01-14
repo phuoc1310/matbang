@@ -2,12 +2,7 @@ import { fetchAllData } from "./api.js";
 import { renderPage } from "./render.js";
 
 document.addEventListener("DOMContentLoaded", async () => {
-  await fetchAllData(10);
-
-  window.PAGE_SIZE = 18;
-  window.currentPage = 1;
-
-  renderPage();
+  
 
   // ===== SEARCH =====
   const searchBtn = document.querySelector("button[type='button'].bg-primary");
