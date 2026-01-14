@@ -1,0 +1,4 @@
+flask
+payos
+python-dotenv
+flask-cors

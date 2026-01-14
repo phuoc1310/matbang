@@ -6,6 +6,45 @@ function initUsersStorage() {
   if (!localStorage.getItem('users')) {
     localStorage.setItem('users', JSON.stringify([]));
   }
+  
+  // Tự động tạo admin mặc định nếu chưa có admin nào
+  // Gọi ở đây để đảm bảo admin luôn được tạo khi hệ thống khởi động
+  try {
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+    const hasAdmin = users.some(u => u.role === 'admin');
+    
+    if (!hasAdmin) {
+      // Tạo admin mặc định
+      const defaultAdmin = {
+        id: 'admin_default_' + Date.now(),
+        email: 'admin@spacerent.com',
+        password: 'admin123', // Mật khẩu mặc định - nên đổi sau
+        fullName: 'Quản trị viên',
+        phone: '',
+        role: 'admin',
+        avatar: '',
+        address: '',
+        createdAt: new Date().toISOString(),
+        verified: true,
+        vipStatus: false,
+        vipExpiry: null,
+        savedListings: [],
+        viewedListings: [],
+        myListings: [],
+        notifications: {
+          email: true,
+          sms: false,
+          push: true
+        }
+      };
+      
+      users.push(defaultAdmin);
+      localStorage.setItem('users', JSON.stringify(users));
+      console.log('Đã tạo tài khoản admin mặc định: admin@spacerent.com / admin123');
+    }
+  } catch (error) {
+    console.error('Lỗi khi tạo admin mặc định:', error);
+  }
 }
 
 // ================== VALIDATION ==================
@@ -61,6 +100,16 @@ function register(userData) {
       };
     }
     
+    // Validate role - chỉ cho phép 'nguoithue' hoặc 'chumattbang', không cho phép 'admin'
+    const allowedRoles = ['nguoithue', 'chumattbang'];
+    const userRole = userData.role || 'nguoithue';
+    if (!allowedRoles.includes(userRole)) {
+      return {
+        success: false,
+        message: 'Vai trò không hợp lệ. Vui lòng chọn lại.'
+      };
+    }
+    
     // Tạo user mới
     const newUser = {
       id: 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
@@ -68,7 +117,7 @@ function register(userData) {
       password: userData.password, // Plain text cho demo
       fullName: userData.fullName || '',
       phone: userData.phone || '',
-      role: userData.role || 'nguoithue', // 'nguoithue' hoặc 'chumattbang'
+      role: userRole, // Chỉ 'nguoithue' hoặc 'chumattbang'
       avatar: '',
       address: userData.address || '',
       createdAt: new Date().toISOString(),
@@ -185,6 +234,12 @@ function isLoggedIn() {
   return getCurrentUser() !== null;
 }
 
+// ================== CHECK IF ADMIN ==================
+function isAdmin() {
+  const currentUser = getCurrentUser();
+  return currentUser && currentUser.role === 'admin';
+}
+
 // ================== UPDATE USER ==================
 function updateCurrentUser(updatedData) {
   try {
@@ -286,6 +341,194 @@ function changePassword(oldPassword, newPassword) {
     
   } catch (error) {
     console.error('Lỗi đổi mật khẩu:', error);
+    return {
+      success: false,
+      message: 'Đã xảy ra lỗi. Vui lòng thử lại sau.'
+    };
+  }
+}
+
+// ================== CHECK IF ADMIN ==================
+function isAdmin() {
+  const currentUser = getCurrentUser();
+  return currentUser && currentUser.role === 'admin';
+}
+
+// ================== CREATE DEFAULT ADMIN ==================
+// Phương án A: Tạo admin mặc định đầu tiên nếu chưa có admin nào
+function createDefaultAdmin() {
+  try {
+    initUsersStorage();
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+    
+    // Kiểm tra xem đã có admin chưa
+    const hasAdmin = users.some(u => u.role === 'admin');
+    if (hasAdmin) {
+      return {
+        success: false,
+        message: 'Đã có admin trong hệ thống.'
+      };
+    }
+    
+    // Tạo admin mặc định
+    const defaultAdmin = {
+      id: 'admin_default_' + Date.now(),
+      email: 'admin@spacerent.com',
+      password: 'admin123', // Mật khẩu mặc định - nên đổi sau
+      fullName: 'Quản trị viên',
+      phone: '',
+      role: 'admin',
+      avatar: '',
+      address: '',
+      createdAt: new Date().toISOString(),
+      verified: true,
+      vipStatus: false,
+      vipExpiry: null,
+      savedListings: [],
+      viewedListings: [],
+      myListings: [],
+      notifications: {
+        email: true,
+        sms: false,
+        push: true
+      }
+    };
+    
+    users.push(defaultAdmin);
+    localStorage.setItem('users', JSON.stringify(users));
+    
+    return {
+      success: true,
+      message: 'Đã tạo tài khoản admin mặc định!',
+      admin: defaultAdmin
+    };
+    
+  } catch (error) {
+    console.error('Lỗi tạo admin mặc định:', error);
+    return {
+      success: false,
+      message: 'Đã xảy ra lỗi khi tạo admin mặc định.'
+    };
+  }
+}
+
+// ================== SET USER AS ADMIN ==================
+// Phương án B: Admin có thể set admin cho user khác
+function setUserAsAdmin(userId) {
+  try {
+    const currentUser = getCurrentUser();
+    
+    // Chỉ admin mới có thể set admin
+    if (!isAdmin()) {
+      return {
+        success: false,
+        message: 'Bạn không có quyền thực hiện thao tác này. Chỉ admin mới có thể set admin.'
+      };
+    }
+    
+    // Không cho phép set chính mình (bảo vệ admin cuối cùng)
+    if (currentUser.id === userId) {
+      return {
+        success: false,
+        message: 'Bạn không thể thay đổi quyền của chính mình.'
+      };
+    }
+    
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+    const userIndex = users.findIndex(u => u.id === userId);
+    
+    if (userIndex === -1) {
+      return {
+        success: false,
+        message: 'Không tìm thấy người dùng.'
+      };
+    }
+    
+    // Set role admin
+    users[userIndex].role = 'admin';
+    localStorage.setItem('users', JSON.stringify(users));
+    
+    // Nếu user đang đăng nhập, cập nhật currentUser
+    if (users[userIndex].id === currentUser.id) {
+      localStorage.setItem('currentUser', JSON.stringify(users[userIndex]));
+    }
+    
+    return {
+      success: true,
+      message: 'Đã cấp quyền admin cho người dùng thành công!',
+      user: users[userIndex]
+    };
+    
+  } catch (error) {
+    console.error('Lỗi set admin:', error);
+    return {
+      success: false,
+      message: 'Đã xảy ra lỗi. Vui lòng thử lại sau.'
+    };
+  }
+}
+
+// ================== REMOVE ADMIN ROLE ==================
+// Admin có thể gỡ quyền admin của user khác (nhưng không được gỡ chính mình)
+function removeAdminRole(userId) {
+  try {
+    const currentUser = getCurrentUser();
+    
+    // Chỉ admin mới có thể gỡ quyền admin
+    if (!isAdmin()) {
+      return {
+        success: false,
+        message: 'Bạn không có quyền thực hiện thao tác này.'
+      };
+    }
+    
+    // Không cho phép gỡ quyền của chính mình
+    if (currentUser.id === userId) {
+      return {
+        success: false,
+        message: 'Bạn không thể gỡ quyền admin của chính mình.'
+      };
+    }
+    
+    const users = JSON.parse(localStorage.getItem('users')) || [];
+    const userIndex = users.findIndex(u => u.id === userId);
+    
+    if (userIndex === -1) {
+      return {
+        success: false,
+        message: 'Không tìm thấy người dùng.'
+      };
+    }
+    
+    // Kiểm tra xem user có phải admin không
+    if (users[userIndex].role !== 'admin') {
+      return {
+        success: false,
+        message: 'Người dùng này không phải admin.'
+      };
+    }
+    
+    // Đếm số admin còn lại
+    const adminCount = users.filter(u => u.role === 'admin').length;
+    if (adminCount <= 1) {
+      return {
+        success: false,
+        message: 'Không thể gỡ quyền admin. Hệ thống cần ít nhất 1 admin.'
+      };
+    }
+    
+    // Chuyển về role mặc định (nguoithue)
+    users[userIndex].role = 'nguoithue';
+    localStorage.setItem('users', JSON.stringify(users));
+    
+    return {
+      success: true,
+      message: 'Đã gỡ quyền admin thành công!',
+      user: users[userIndex]
+    };
+    
+  } catch (error) {
+    console.error('Lỗi gỡ quyền admin:', error);
     return {
       success: false,
       message: 'Đã xảy ra lỗi. Vui lòng thử lại sau.'

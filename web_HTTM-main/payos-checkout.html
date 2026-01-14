@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thanh toán PayOS - SpaceRent</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "primary-hover": "#0f6bd0",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#1e293b",
+                        "border-light": "#e2e8f0",
+                        "border-dark": "#334155",
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Manrope', sans-serif; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark min-h-screen flex items-center justify-center p-4">
+    <div class="max-w-md w-full">
+        <div class="bg-surface-light dark:bg-surface-dark rounded-xl shadow-2xl overflow-hidden">
+            <!-- Header -->
+            <div class="bg-gradient-to-r from-primary to-primary-hover p-6 text-white text-center">
+                <div class="flex items-center justify-center gap-3 mb-2">
+                    <span class="material-symbols-outlined text-4xl">account_balance</span>
+                    <h1 class="text-2xl font-bold">PayOS</h1>
+                </div>
+                <p class="text-sm opacity-90">Hệ thống thanh toán trực tuyến</p>
+            </div>
+            
+            <!-- Content -->
+            <div id="checkout-content" class="p-6">
+                <!-- Loading state -->
+                <div id="loading-state" class="text-center py-8">
+                    <div class="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary mb-4"></div>
+                    <p class="text-slate-600 dark:text-slate-400">Đang xử lý thanh toán...</p>
+                </div>
+                
+                <!-- Payment form -->
+                <div id="payment-form" class="hidden">
+                    <div class="mb-6">
+                        <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-2">Thông tin thanh toán</h2>
+                        <p class="text-sm text-slate-600 dark:text-slate-400" id="order-info"></p>
+                    </div>
+                    
+                    <div class="space-y-4 mb-6">
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Phương thức thanh toán</label>
+                            <div class="grid grid-cols-3 gap-3">
+                                <button class="payment-method p-4 border-2 border-slate-200 dark:border-slate-700 rounded-lg hover:border-primary transition-colors" data-method="vnpay">
+                                    <div class="text-2xl mb-1">💳</div>
+                                    <div class="text-xs font-semibold">VNPay</div>
+                                </button>
+                                <button class="payment-method p-4 border-2 border-slate-200 dark:border-slate-700 rounded-lg hover:border-primary transition-colors" data-method="momo">
+                                    <div class="text-2xl mb-1">💜</div>
+                                    <div class="text-xs font-semibold">MoMo</div>
+                                </button>
+                                <button class="payment-method p-4 border-2 border-slate-200 dark:border-slate-700 rounded-lg hover:border-primary transition-colors" data-method="zalopay">
+                                    <div class="text-2xl mb-1">💙</div>
+                                    <div class="text-xs font-semibold">ZaloPay</div>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-3">
+                        <button id="pay-btn" class="flex-1 px-6 py-3 bg-primary hover:bg-primary-hover text-white rounded-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                            Thanh toán
+                        </button>
+                        <button id="cancel-btn" class="px-6 py-3 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-lg font-semibold transition-colors">
+                            Hủy
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Success state -->
+                <div id="success-state" class="hidden text-center py-8">
+                    <div class="mb-4">
+                        <span class="material-symbols-outlined text-green-500 text-6xl">check_circle</span>
+                    </div>
+                    <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-2">Thanh toán thành công!</h2>
+                    <p class="text-slate-600 dark:text-slate-400 mb-6">VIP của bạn đã được kích hoạt thành công.</p>
+                    <button id="back-btn" class="px-6 py-3 bg-primary hover:bg-primary-hover text-white rounded-lg font-semibold transition-colors">
+                        Về trang tài khoản
+                    </button>
+                </div>
+                
+                <!-- Error state -->
+                <div id="error-state" class="hidden text-center py-8">
+                    <div class="mb-4">
+                        <span class="material-symbols-outlined text-red-500 text-6xl">error</span>
+                    </div>
+                    <h2 class="text-2xl font-bold text-slate-900 dark:text-white mb-2">Thanh toán thất bại</h2>
+                    <p class="text-slate-600 dark:text-slate-400 mb-6" id="error-message">Đã xảy ra lỗi trong quá trình thanh toán.</p>
+                    <button id="retry-btn" class="px-6 py-3 bg-primary hover:bg-primary-hover text-white rounded-lg font-semibold transition-colors mr-3">
+                        Thử lại
+                    </button>
+                    <button id="cancel-error-btn" class="px-6 py-3 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-lg font-semibold transition-colors">
+                        Hủy
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- PayOS SDK - Phải load trước các script khác -->
+    <script src="https://cdn.payos.vn/payos-checkout/v1/stable/payos-initialize.js" 
+            onerror="console.error('Không thể load PayOS SDK từ CDN. Có thể do mạng hoặc CDN lỗi.'); window.PayOSLoadError = true;"
+            onload="console.log('✅ PayOS SDK đã load thành công'); window.PayOSLoaded = true;"></script>
+    <script src="asset/js/auth.js"></script>
+    <script src="asset/js/vip.js"></script>
+    <script>
+        // Đợi PayOS SDK load xong trước khi load payos-demo.js
+        function waitForPayOS(callback, maxAttempts = 60) {
+            // Kiểm tra nhiều cách PayOS có thể được expose
+            const isPayOSAvailable = typeof PayOS !== 'undefined' || 
+                                     typeof window.PayOS !== 'undefined';
+            
+            if (isPayOSAvailable || window.PayOSLoaded) {
+                if (!isPayOSAvailable && window.PayOSLoaded) {
+                    console.warn('⚠️ PayOS SDK script đã load nhưng PayOS object chưa sẵn sàng. Sẽ dùng demo mode nếu cần.');
+                } else {
+                    console.log('✅ PayOS SDK đã sẵn sàng');
+                }
+                callback();
+            } else if (window.PayOSLoadError) {
+                console.warn('⚠️ PayOS SDK không load được từ CDN. Sẽ dùng demo mode nếu cần.');
+                callback(); // Vẫn tiếp tục để dùng demo mode
+            } else if (maxAttempts > 0) {
+                setTimeout(() => waitForPayOS(callback, maxAttempts - 1), 200);
+            } else {
+                console.warn('⚠️ PayOS SDK không load được sau 12 giây. Sẽ dùng demo mode nếu cần.');
+                callback(); // Vẫn tiếp tục để dùng demo mode
+            }
+        }
+        
+        // Load payos-demo.js sau khi PayOS SDK đã sẵn sàng
+        waitForPayOS(() => {
+            const script = document.createElement('script');
+            script.src = 'asset/js/payos-demo.js';
+            script.onload = () => {
+                // Sau khi payos-demo.js load xong, khởi tạo checkout
+                initCheckout();
+            };
+            document.body.appendChild(script);
+        });
+        
+        // Khởi tạo checkout logic
+        function initCheckout() {
+            // Get order data from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const orderCode = urlParams.get('orderCode');
+            const amount = parseInt(urlParams.get('amount'));
+            const packageId = urlParams.get('packageId');
+            
+            let selectedMethod = null;
+            
+            // Initialize
+            if (!orderCode || !amount || !packageId) {
+                showError('Thông tin đơn hàng không hợp lệ.');
+                return;
+            }
+            
+            // Show payment form after 1 second (simulate loading)
+            setTimeout(() => {
+                document.getElementById('loading-state').classList.add('hidden');
+                document.getElementById('payment-form').classList.remove('hidden');
+                
+                // Format amount
+                const formattedAmount = new Intl.NumberFormat('vi-VN', {
+                    style: 'currency',
+                    currency: 'VND'
+                }).format(amount);
+                
+                document.getElementById('order-info').textContent = `Số tiền: ${formattedAmount}`;
+            }, 1000);
+            
+            // Payment method selection
+            document.querySelectorAll('.payment-method').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.payment-method').forEach(b => {
+                        b.classList.remove('border-primary', 'bg-primary/10');
+                    });
+                    btn.classList.add('border-primary', 'bg-primary/10');
+                    selectedMethod = btn.getAttribute('data-method');
+                    document.getElementById('pay-btn').disabled = false;
+                });
+            });
+            
+            // Pay button
+            document.getElementById('pay-btn').addEventListener('click', () => {
+                if (!selectedMethod) {
+                    alert('Vui lòng chọn phương thức thanh toán');
+                    return;
+                }
+                
+                processPayment();
+            });
+            
+            // Cancel button
+            document.getElementById('cancel-btn').addEventListener('click', () => {
+                window.location.href = 'taikhoan.html';
+            });
+            
+            // Back button
+            document.getElementById('back-btn').addEventListener('click', () => {
+                window.location.href = 'taikhoan.html';
+            });
+            
+            // Retry button
+            document.getElementById('retry-btn').addEventListener('click', () => {
+                window.location.reload();
+            });
+            
+            // Cancel error button
+            document.getElementById('cancel-error-btn').addEventListener('click', () => {
+                window.location.href = 'taikhoan.html';
+            });
+            
+            // Process payment
+            function processPayment() {
+                document.getElementById('payment-form').classList.add('hidden');
+                document.getElementById('loading-state').classList.remove('hidden');
+                
+                // Simulate payment processing (2-3 seconds)
+                setTimeout(async () => {
+                    // Verify payment (demo: 90% success)
+                    const isSuccess = Math.random() > 0.1;
+                    
+                    if (isSuccess) {
+                        // Chỉ gọi handlePayOSCallback khi thành công
+                        try {
+                            const result = await handlePayOSCallback(orderCode, 'success');
+                            
+                            if (result.success) {
+                                showSuccess();
+                            } else {
+                                showError(result.message);
+                            }
+                        } catch (error) {
+                            console.error('Lỗi xử lý callback:', error);
+                            showError('Đã xảy ra lỗi khi xử lý thanh toán.');
+                        }
+                    } else {
+                        // Thanh toán thất bại - KHÔNG gọi handlePayOSCallback
+                        // KHÔNG kích hoạt VIP
+                        showError('Thanh toán thất bại. Vui lòng thử lại.');
+                    }
+                }, 2000 + Math.random() * 1000);
+            }
+            
+            function showSuccess() {
+                document.getElementById('loading-state').classList.add('hidden');
+                document.getElementById('success-state').classList.remove('hidden');
+            }
+            
+            function showError(message) {
+                document.getElementById('loading-state').classList.add('hidden');
+                document.getElementById('error-state').classList.remove('hidden');
+                document.getElementById('error-message').textContent = message;
+            }
+        }
+    </script>
+</body>
+</html>

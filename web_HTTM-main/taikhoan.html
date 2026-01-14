@@ -13,6 +13,12 @@
                     colors: {
                         "primary": "#137fec",
                         "primary-hover": "#0f6bd0",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#1e293b",
+                        "border-light": "#e2e8f0",
+                        "border-dark": "#334155",
                     }
                 }
             }
@@ -24,68 +30,577 @@
         body { font-family: 'Manrope', sans-serif; }
     </style>
 </head>
-<body class="bg-gray-50 min-h-screen p-8">
-    <div class="max-w-4xl mx-auto">
-        <div class="flex justify-between items-center mb-4">
-            <h1 class="text-3xl font-bold">🎉 Đăng nhập thành công!</h1>
-            <button id="logout-btn" class="flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-semibold transition-colors">
-                <span class="material-symbols-outlined text-[20px]">logout</span>
-                <span>Đăng xuất</span>
-            </button>
+<body class="bg-background-light dark:bg-background-dark min-h-screen p-4 md:p-8">
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+            <h1 class="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">Tài khoản của tôi</h1>
+            <div class="flex gap-3">
+                <a id="admin-link" href="admin.html" class="hidden flex items-center gap-2 px-4 py-2 bg-purple-500 hover:bg-purple-600 text-white rounded-lg font-semibold transition-colors">
+                    <span class="material-symbols-outlined text-[20px]">admin_panel_settings</span>
+                    <span>Quản lý người dùng</span>
+                </a>
+                <a href="Trangchu.html" class="flex items-center gap-2 px-4 py-2 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-lg font-semibold transition-colors">
+                    <span class="material-symbols-outlined text-[20px]">home</span>
+                    <span>Về trang chủ</span>
+                </a>
+                <button id="logout-btn" class="flex items-center gap-2 px-4 py-2 bg-red-500 hover:bg-red-600 text-white rounded-lg font-semibold transition-colors">
+                    <span class="material-symbols-outlined text-[20px]">logout</span>
+                    <span>Đăng xuất</span>
+                </button>
+            </div>
         </div>
-        <!-- Error/Success Message -->
-        <div id="message-container" class="hidden mb-4 p-3 rounded-lg text-sm font-medium"></div>
         
-        <div class="bg-white p-6 rounded-lg shadow">
-            <p class="text-lg mb-4">Đây là trang tài khoản (sẽ hoàn thiện NGÀY 2)</p>
-            <div id="user-info" class="space-y-2 mb-4"></div>
-            <div class="flex gap-3 mt-4">
-                <a href="Trangchu.html" class="inline-block px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-semibold transition-colors">← Về trang chủ</a>
+        <!-- Error/Success Message -->
+        <div id="message-container" class="hidden mb-4 p-4 rounded-lg text-sm font-medium"></div>
+        
+        <!-- Main Content -->
+        <div id="main-content" class="bg-surface-light dark:bg-surface-dark rounded-xl shadow-lg overflow-hidden">
+            <!-- Tabs Navigation -->
+            <div class="border-b border-border-light dark:border-border-dark">
+                <div class="flex overflow-x-auto">
+                    <button class="tab-btn active px-6 py-4 font-semibold text-sm border-b-2 border-primary text-primary dark:text-primary transition-colors whitespace-nowrap" data-tab="profile">
+                        <span class="material-symbols-outlined text-[18px] align-middle mr-2">person</span>
+                        Thông tin cá nhân
+                    </button>
+                    <button class="tab-btn px-6 py-4 font-semibold text-sm border-b-2 border-transparent text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors whitespace-nowrap" data-tab="edit">
+                        <span class="material-symbols-outlined text-[18px] align-middle mr-2">edit</span>
+                        Chỉnh sửa thông tin
+                    </button>
+                    <button class="tab-btn px-6 py-4 font-semibold text-sm border-b-2 border-transparent text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors whitespace-nowrap" data-tab="password">
+                        <span class="material-symbols-outlined text-[18px] align-middle mr-2">lock</span>
+                        Đổi mật khẩu
+                    </button>
+                    <button class="tab-btn px-6 py-4 font-semibold text-sm border-b-2 border-transparent text-slate-600 dark:text-slate-400 hover:text-primary dark:hover:text-primary transition-colors whitespace-nowrap" data-tab="vip">
+                        <span class="material-symbols-outlined text-[18px] align-middle mr-2">star</span>
+                        Nâng cấp VIP
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Tab Content -->
+            <div class="p-6 md:p-8">
+                <!-- Tab 1: Thông tin cá nhân -->
+                <div id="tab-profile" class="tab-content">
+                    <h2 class="text-xl font-bold mb-6 text-slate-900 dark:text-white">Thông tin tài khoản</h2>
+                    <div id="user-info" class="space-y-4"></div>
+                </div>
+                
+                <!-- Tab 2: Chỉnh sửa thông tin -->
+                <div id="tab-edit" class="tab-content hidden">
+                    <h2 class="text-xl font-bold mb-6 text-slate-900 dark:text-white">Chỉnh sửa thông tin cá nhân</h2>
+                    <form id="edit-profile-form" class="space-y-5">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Họ và tên</label>
+                                <input type="text" id="edit-fullName" class="w-full px-4 py-2.5 border border-border-light dark:border-border-dark rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all" placeholder="Nhập họ và tên">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Số điện thoại</label>
+                                <input type="tel" id="edit-phone" class="w-full px-4 py-2.5 border border-border-light dark:border-border-dark rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all" placeholder="Nhập số điện thoại">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Email</label>
+                            <input type="email" id="edit-email" class="w-full px-4 py-2.5 border border-border-light dark:border-border-dark rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 cursor-not-allowed" value="" disabled>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Email không thể thay đổi</p>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Địa chỉ</label>
+                            <input type="text" id="edit-address" class="w-full px-4 py-2.5 border border-border-light dark:border-border-dark rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all" placeholder="Nhập địa chỉ">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Vai trò</label>
+                            <input type="text" class="w-full px-4 py-2.5 border border-border-light dark:border-border-dark rounded-lg bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 cursor-not-allowed" value="" id="edit-role" disabled>
+                        </div>
+                        <div class="flex gap-3 pt-4">
+                            <button type="submit" class="px-6 py-2.5 bg-primary hover:bg-primary-hover text-white rounded-lg font-semibold transition-colors flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[18px]">save</span>
+                                <span>Lưu thay đổi</span>
+                            </button>
+                            <button type="button" id="cancel-edit-btn" class="px-6 py-2.5 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-lg font-semibold transition-colors">
+                                Hủy
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Tab 3: Đổi mật khẩu -->
+                <div id="tab-password" class="tab-content hidden">
+                    <h2 class="text-xl font-bold mb-6 text-slate-900 dark:text-white">Đổi mật khẩu</h2>
+                    <form id="change-password-form" class="space-y-5 max-w-md">
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Mật khẩu hiện tại</label>
+                            <input type="password" id="old-password" class="w-full px-4 py-2.5 border border-border-light dark:border-border-dark rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all" placeholder="Nhập mật khẩu hiện tại" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Mật khẩu mới</label>
+                            <input type="password" id="new-password" class="w-full px-4 py-2.5 border border-border-light dark:border-border-dark rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all" placeholder="Nhập mật khẩu mới (tối thiểu 6 ký tự)" required>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Xác nhận mật khẩu mới</label>
+                            <input type="password" id="confirm-password" class="w-full px-4 py-2.5 border border-border-light dark:border-border-dark rounded-lg bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-primary focus:border-transparent transition-all" placeholder="Nhập lại mật khẩu mới" required>
+                        </div>
+                        <div class="flex gap-3 pt-4">
+                            <button type="submit" class="px-6 py-2.5 bg-primary hover:bg-primary-hover text-white rounded-lg font-semibold transition-colors flex items-center gap-2">
+                                <span class="material-symbols-outlined text-[18px]">lock_reset</span>
+                                <span>Đổi mật khẩu</span>
+                            </button>
+                            <button type="button" id="cancel-password-btn" class="px-6 py-2.5 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-lg font-semibold transition-colors">
+                                Hủy
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Tab 4: Nâng cấp VIP -->
+                <div id="tab-vip" class="tab-content hidden">
+                    <h2 class="text-xl font-bold mb-6 text-slate-900 dark:text-white">Nâng cấp VIP</h2>
+                    <div id="vip-content"></div>
+                </div>
             </div>
         </div>
     </div>
     
+    <!-- PayOS SDK - Phải load trước các script khác -->
+    <script src="https://cdn.payos.vn/payos-checkout/v1/stable/payos-initialize.js" 
+            onerror="console.error('Không thể load PayOS SDK từ CDN. Có thể do mạng hoặc CDN lỗi.'); window.PayOSLoadError = true;"
+            onload="console.log('✅ PayOS SDK đã load thành công'); window.PayOSLoaded = true;"></script>
     <script src="asset/js/auth.js"></script>
+    <script src="asset/js/vip.js"></script>
+    <script>
+        // Đợi PayOS SDK load xong trước khi load payos-demo.js
+        function waitForPayOS(callback, maxAttempts = 60) {
+            // Kiểm tra nhiều cách PayOS có thể được expose
+            const isPayOSAvailable = typeof PayOS !== 'undefined' || 
+                                     typeof window.PayOS !== 'undefined';
+            
+            if (isPayOSAvailable || window.PayOSLoaded) {
+                if (!isPayOSAvailable && window.PayOSLoaded) {
+                    console.warn('⚠️ PayOS SDK script đã load nhưng PayOS object chưa sẵn sàng. Sẽ dùng demo mode.');
+                    console.log('💡 Tip: PayOS có thể cần thêm thời gian để khởi tạo. Hãy chờ thêm vài giây.');
+                } else {
+                    console.log('✅ PayOS SDK đã sẵn sàng');
+                }
+                callback();
+            } else if (window.PayOSLoadError) {
+                console.error('❌ PayOS SDK không load được từ CDN. Sẽ dùng demo mode.');
+                callback(); // Vẫn tiếp tục để dùng demo mode
+            } else if (maxAttempts > 0) {
+                setTimeout(() => waitForPayOS(callback, maxAttempts - 1), 200);
+            } else {
+                console.warn('⚠️ PayOS SDK không load được sau 12 giây. Có thể do mạng hoặc CDN lỗi. Sẽ dùng demo mode.');
+                console.log('💡 Không sao, hệ thống vẫn hoạt động với chế độ demo.');
+                callback(); // Vẫn tiếp tục để dùng demo mode
+            }
+        }
+        
+        // Đợi DOM ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                waitForPayOS(loadPayOSScripts);
+            });
+        } else {
+            waitForPayOS(loadPayOSScripts);
+        }
+        
+        function loadPayOSScripts() {
+            // Load payos-demo.js sau khi PayOS SDK đã sẵn sàng (hoặc timeout)
+            const script = document.createElement('script');
+            script.src = 'asset/js/payos-demo.js';
+            script.onload = () => {
+                // Load payos-check.js sau payos-demo.js
+                const checkScript = document.createElement('script');
+                checkScript.src = 'asset/js/payos-check.js';
+                document.body.appendChild(checkScript);
+            };
+            document.body.appendChild(script);
+        }
+    </script>
     <script>
         const user = getCurrentUser();
-        const userInfoDiv = document.getElementById("user-info");
-        const logoutBtn = document.getElementById("logout-btn");
         const messageContainer = document.getElementById("message-container");
+        const logoutBtn = document.getElementById("logout-btn");
         
         // ================== SHOW MESSAGE ==================
         function showMessage(message, type = "error") {
             messageContainer.textContent = message;
-            messageContainer.className = `mb-4 p-3 rounded-lg text-sm font-medium ${
+            messageContainer.className = `mb-4 p-4 rounded-lg text-sm font-medium ${
                 type === "success" 
                     ? "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300" 
                     : "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300"
             }`;
             messageContainer.classList.remove("hidden");
+            setTimeout(() => {
+                messageContainer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+            }, 100);
         }
         
         function hideMessage() {
             messageContainer.classList.add("hidden");
         }
         
-        if (user) {
-            userInfoDiv.innerHTML = `
-                <p><strong>ID:</strong> ${user.id}</p>
-                <p><strong>Họ tên:</strong> ${user.fullName || 'Chưa cập nhật'}</p>
-                <p><strong>Email:</strong> ${user.email}</p>
-                <p><strong>SĐT:</strong> ${user.phone || 'Chưa cập nhật'}</p>
-                <p><strong>Role:</strong> ${user.role === 'chumattbang' ? 'Chủ mặt bằng' : 'Người thuê'}</p>
-                <p><strong>VIP Status:</strong> ${user.vipStatus ? 'Có VIP' : 'Chưa có VIP'}</p>
-            `;
+        // ================== CHECK AUTH ==================
+        if (!user) {
+            document.getElementById("main-content").innerHTML = '<div class="p-8 text-center"><p class="text-red-600 dark:text-red-400 mb-4">Chưa đăng nhập. Đang chuyển hướng...</p></div>';
+            logoutBtn.style.display = 'none';
+            setTimeout(() => {
+                window.location.href = 'dangnhap.html';
+            }, 1500);
+        } else {
+            // ================== RENDER USER INFO ==================
+            function renderUserInfo() {
+                const userInfoDiv = document.getElementById("user-info");
+                const roleText = user.role === 'chumattbang' ? 'Chủ mặt bằng' : 'Người thuê';
+                const vipStatusInfo = checkVipStatus();
+                let vipStatusBadge = '';
+                if (vipStatusInfo.isVip) {
+                    vipStatusBadge = `<span class="px-3 py-1 bg-yellow-100 dark:bg-yellow-900/30 text-yellow-700 dark:text-yellow-300 rounded-full text-xs font-semibold">VIP (Còn ${vipStatusInfo.daysLeft} ngày)</span>`;
+                } else {
+                    vipStatusBadge = `<span class="px-3 py-1 bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-400 rounded-full text-xs font-semibold">Thường</span>`;
+                }
+                
+                userInfoDiv.innerHTML = `
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mb-1">Họ và tên</p>
+                            <p class="text-base font-semibold text-slate-900 dark:text-white">${user.fullName || 'Chưa cập nhật'}</p>
+                        </div>
+                        <div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mb-1">Email</p>
+                            <p class="text-base font-semibold text-slate-900 dark:text-white">${user.email}</p>
+                        </div>
+                        <div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mb-1">Số điện thoại</p>
+                            <p class="text-base font-semibold text-slate-900 dark:text-white">${user.phone || 'Chưa cập nhật'}</p>
+                        </div>
+                        <div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mb-1">Địa chỉ</p>
+                            <p class="text-base font-semibold text-slate-900 dark:text-white">${user.address || 'Chưa cập nhật'}</p>
+                        </div>
+                        <div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mb-1">Vai trò</p>
+                            <p class="text-base font-semibold text-slate-900 dark:text-white">${roleText}</p>
+                        </div>
+                        <div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mb-1">Trạng thái VIP</p>
+                            <p class="text-base">${vipStatusBadge}</p>
+                        </div>
+                        ${vipStatusInfo.isVip ? `
+                        <div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-lg">
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mb-1">VIP hết hạn</p>
+                            <p class="text-base font-semibold text-slate-900 dark:text-white">${formatDate(vipStatusInfo.expiryDate.toISOString())}</p>
+                        </div>
+                        ` : ''}
+                    </div>
+                `;
+            }
             
-            // Xử lý nút đăng xuất (không dùng confirm/alert)
+            // ================== LOAD EDIT FORM ==================
+            function loadEditForm() {
+                document.getElementById("edit-fullName").value = user.fullName || '';
+                document.getElementById("edit-phone").value = user.phone || '';
+                document.getElementById("edit-email").value = user.email;
+                document.getElementById("edit-address").value = user.address || '';
+                document.getElementById("edit-role").value = user.role === 'chumattbang' ? 'Chủ mặt bằng' : 'Người thuê';
+            }
+            
+            // ================== TAB SWITCHING ==================
+            const tabButtons = document.querySelectorAll('.tab-btn');
+            const tabContents = document.querySelectorAll('.tab-content');
+            
+            tabButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const targetTab = btn.getAttribute('data-tab');
+                    
+                    // Update buttons
+                    tabButtons.forEach(b => {
+                        b.classList.remove('active', 'border-primary', 'text-primary');
+                        b.classList.add('border-transparent', 'text-slate-600', 'dark:text-slate-400');
+                    });
+                    btn.classList.add('active', 'border-primary', 'text-primary');
+                    btn.classList.remove('border-transparent', 'text-slate-600', 'dark:text-slate-400');
+                    
+                    // Update content
+                    tabContents.forEach(content => content.classList.add('hidden'));
+                    document.getElementById(`tab-${targetTab}`).classList.remove('hidden');
+                    
+                    // Load form data when switching to edit tab
+                    if (targetTab === 'edit') {
+                        loadEditForm();
+                    }
+                    
+                    // Load VIP content when switching to VIP tab
+                    if (targetTab === 'vip') {
+                        renderVipContent();
+                    }
+                    
+                    hideMessage();
+                });
+            });
+            
+            // ================== RENDER VIP CONTENT ==================
+            function renderVipContent() {
+                const vipContent = document.getElementById('vip-content');
+                const vipStatus = checkVipStatus();
+                
+                let vipStatusHtml = '';
+                if (vipStatus.isVip) {
+                    const expiryDate = formatDate(vipStatus.expiryDate.toISOString());
+                    vipStatusHtml = `
+                        <div class="mb-6 p-4 bg-gradient-to-r from-yellow-50 to-yellow-100 dark:from-yellow-900/20 dark:to-yellow-800/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-yellow-600 dark:text-yellow-400 text-3xl">star</span>
+                                <div>
+                                    <h3 class="font-bold text-yellow-900 dark:text-yellow-200">Tài khoản VIP của bạn đang hoạt động</h3>
+                                    <p class="text-sm text-yellow-700 dark:text-yellow-300">Hết hạn vào: ${expiryDate} (Còn ${vipStatus.daysLeft} ngày)</p>
+                                    ${vipStatus.daysLeft <= 7 ? '<p class="text-xs text-yellow-600 dark:text-yellow-400 mt-1">⚠️ VIP của bạn sắp hết hạn! Gia hạn ngay để tiếp tục sử dụng.</p>' : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    vipStatusHtml = `
+                        <div class="mb-6 p-4 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg">
+                            <div class="flex items-center gap-3">
+                                <span class="material-symbols-outlined text-slate-400 text-3xl">info</span>
+                                <div>
+                                    <h3 class="font-semibold text-slate-900 dark:text-white">Tài khoản thường</h3>
+                                    <p class="text-sm text-slate-600 dark:text-slate-400">Nâng cấp VIP để được hưởng nhiều ưu đãi đặc biệt</p>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                // Render packages
+                const packagesHtml = VIP_PACKAGES.map(pkg => {
+                    const discountBadge = pkg.discount > 0 ? `
+                        <div class="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded-bl-lg rounded-tr-lg">
+                            -${pkg.discount}%
+                        </div>
+                    ` : '';
+                    
+                    const popularBadge = pkg.popular ? `
+                        <div class="absolute top-2 left-2 bg-primary text-white text-xs font-bold px-3 py-1 rounded-full">
+                            Phổ biến
+                        </div>
+                    ` : '';
+                    
+                    return `
+                        <div class="relative p-6 bg-white dark:bg-slate-800 border-2 ${pkg.popular ? 'border-primary' : 'border-slate-200 dark:border-slate-700'} rounded-xl hover:shadow-lg transition-all">
+                            ${discountBadge}
+                            ${popularBadge}
+                            <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">${pkg.name}</h3>
+                            <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">${pkg.description}</p>
+                            <div class="mb-4">
+                                ${pkg.discount > 0 ? `
+                                    <p class="text-sm text-slate-400 line-through">${formatCurrency(pkg.originalPrice)}</p>
+                                ` : ''}
+                                <p class="text-3xl font-bold text-primary">${formatCurrency(pkg.price)}</p>
+                            </div>
+                            <button onclick="selectVipPackage('${pkg.id}')" class="w-full px-4 py-2.5 ${pkg.popular ? 'bg-primary hover:bg-primary-hover' : 'bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600'} text-white rounded-lg font-semibold transition-colors">
+                                ${vipStatus.isVip ? 'Gia hạn' : 'Chọn gói'}
+                            </button>
+                        </div>
+                    `;
+                }).join('');
+                
+                vipContent.innerHTML = `
+                    ${vipStatusHtml}
+                    <div>
+                        <h3 class="text-lg font-bold mb-4 text-slate-900 dark:text-white">Chọn gói VIP</h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                            ${packagesHtml}
+                        </div>
+                    </div>
+                    <div class="mt-8 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                        <h4 class="font-semibold text-blue-900 dark:text-blue-200 mb-2">✨ Ưu đãi VIP</h4>
+                        <ul class="text-sm text-blue-800 dark:text-blue-300 space-y-1">
+                            <li>• Tin đăng được ưu tiên hiển thị</li>
+                            <li>• Đăng tin không giới hạn</li>
+                            <li>• Hỗ trợ ưu tiên 24/7</li>
+                            <li>• Badge VIP trên hồ sơ</li>
+                        </ul>
+                    </div>
+                    ${renderTransactionHistory()}
+                `;
+            }
+            
+            // ================== RENDER TRANSACTION HISTORY ==================
+            function renderTransactionHistory() {
+                const transactions = getTransactionHistory();
+                
+                if (transactions.length === 0) {
+                    return '';
+                }
+                
+                const transactionsHtml = transactions.map(txn => {
+                    const statusBadge = txn.status === 'completed' 
+                        ? '<span class="px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded text-xs font-semibold">Thành công</span>'
+                        : '<span class="px-2 py-1 bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 rounded text-xs font-semibold">Thất bại</span>';
+                    
+                    return `
+                        <tr class="border-b border-slate-200 dark:border-slate-700">
+                            <td class="px-4 py-3 text-sm text-slate-900 dark:text-white">${txn.packageName}</td>
+                            <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">${formatCurrency(txn.amount)}</td>
+                            <td class="px-4 py-3 text-sm">${statusBadge}</td>
+                            <td class="px-4 py-3 text-sm text-slate-600 dark:text-slate-400">${formatDate(txn.createdAt)}</td>
+                        </tr>
+                    `;
+                }).join('');
+                
+                return `
+                    <div class="mt-8">
+                        <h3 class="text-lg font-bold mb-4 text-slate-900 dark:text-white">Lịch sử giao dịch</h3>
+                        <div class="overflow-x-auto">
+                            <table class="w-full bg-white dark:bg-slate-800 rounded-lg">
+                                <thead class="bg-slate-50 dark:bg-slate-900">
+                                    <tr>
+                                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase">Gói</th>
+                                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase">Số tiền</th>
+                                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase">Trạng thái</th>
+                                        <th class="px-4 py-3 text-left text-xs font-semibold text-slate-700 dark:text-slate-300 uppercase">Ngày</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    ${transactionsHtml}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            // ================== SELECT VIP PACKAGE ==================
+            function selectVipPackage(packageId) {
+                const result = purchaseVip(packageId);
+                if (!result.success) {
+                    showMessage(result.message, 'error');
+                    return;
+                }
+                
+                // Lưu order data tạm
+                localStorage.setItem(`payos_order_${result.orderCode}`, JSON.stringify({
+                    packageId: packageId,
+                    orderCode: result.orderCode,
+                    amount: result.package.price
+                }));
+                
+                // Hiển thị loading
+                showMessage('Đang tạo link thanh toán...', 'success');
+                
+                // Tạo payment link
+                createPayOSPaymentLink({
+                    orderCode: result.orderCode,
+                    amount: result.package.price,
+                    packageId: packageId,
+                    description: `Thanh toán ${result.package.name}`
+                }).then(paymentResult => {
+                    if (paymentResult.success) {
+                        console.log('Redirecting to:', paymentResult.checkoutUrl);
+                        // Redirect to PayOS checkout
+                        window.location.href = paymentResult.checkoutUrl;
+                    } else {
+                        showMessage(paymentResult.message || 'Không thể tạo link thanh toán. Vui lòng thử lại.', 'error');
+                    }
+                }).catch(error => {
+                    console.error('Error creating payment link:', error);
+                    showMessage(error.message || 'Đã xảy ra lỗi. Vui lòng thử lại.', 'error');
+                });
+            }
+            
+            // Make functions global
+            window.selectVipPackage = selectVipPackage;
+            
+            // ================== EDIT PROFILE FORM ==================
+            document.getElementById("edit-profile-form").addEventListener("submit", (e) => {
+                e.preventDefault();
+                hideMessage();
+                
+                const fullName = document.getElementById("edit-fullName").value.trim();
+                const phone = document.getElementById("edit-phone").value.trim();
+                const address = document.getElementById("edit-address").value.trim();
+                
+                // Validate phone
+                if (phone && !validatePhone(phone)) {
+                    showMessage("Số điện thoại không hợp lệ. Vui lòng nhập 10-11 số.", "error");
+                    return;
+                }
+                
+                const result = updateCurrentUser({
+                    fullName: fullName,
+                    phone: phone,
+                    address: address
+                });
+                
+                if (result.success) {
+                    // Update user object
+                    Object.assign(user, result.user);
+                    showMessage(result.message, "success");
+                    renderUserInfo();
+                    // Switch to profile tab after 1 second
+                    setTimeout(() => {
+                        document.querySelector('[data-tab="profile"]').click();
+                    }, 1000);
+                } else {
+                    showMessage(result.message, "error");
+                }
+            });
+            
+            // Cancel edit button
+            document.getElementById("cancel-edit-btn").addEventListener("click", () => {
+                document.querySelector('[data-tab="profile"]').click();
+            });
+            
+            // ================== CHANGE PASSWORD FORM ==================
+            document.getElementById("change-password-form").addEventListener("submit", (e) => {
+                e.preventDefault();
+                hideMessage();
+                
+                const oldPassword = document.getElementById("old-password").value;
+                const newPassword = document.getElementById("new-password").value;
+                const confirmPassword = document.getElementById("confirm-password").value;
+                
+                // Validate
+                if (newPassword !== confirmPassword) {
+                    showMessage("Mật khẩu mới và xác nhận mật khẩu không khớp.", "error");
+                    return;
+                }
+                
+                if (!validatePassword(newPassword)) {
+                    showMessage("Mật khẩu mới phải có ít nhất 6 ký tự.", "error");
+                    return;
+                }
+                
+                const result = changePassword(oldPassword, newPassword);
+                
+                if (result.success) {
+                    showMessage(result.message, "success");
+                    // Clear form
+                    document.getElementById("change-password-form").reset();
+                    // Switch to profile tab after 1 second
+                    setTimeout(() => {
+                        document.querySelector('[data-tab="profile"]').click();
+                    }, 1000);
+                } else {
+                    showMessage(result.message, "error");
+                }
+            });
+            
+            // Cancel password button
+            document.getElementById("cancel-password-btn").addEventListener("click", () => {
+                document.getElementById("change-password-form").reset();
+                document.querySelector('[data-tab="profile"]').click();
+            });
+            
+            // ================== LOGOUT ==================
             logoutBtn.addEventListener("click", () => {
                 const result = logout();
                 if (result.success) {
                     showMessage("Đăng xuất thành công! Đang chuyển hướng...", "success");
-                    // Disable button
                     logoutBtn.disabled = true;
                     logoutBtn.innerHTML = '<span class="material-symbols-outlined text-[20px]">hourglass_empty</span><span>Đang đăng xuất...</span>';
-                    // Redirect sau 0.8 giây
                     setTimeout(() => {
                         window.location.href = "dangnhap.html";
                     }, 800);
@@ -93,12 +608,29 @@
                     showMessage("Có lỗi xảy ra: " + result.message, "error");
                 }
             });
-        } else {
-            userInfoDiv.innerHTML = '<p class="text-red-600">Chưa đăng nhập. Đang chuyển hướng...</p>';
-            logoutBtn.style.display = 'none';
-            setTimeout(() => {
-                window.location.href = 'dangnhap.html';
-            }, 1500);
+            
+            // ================== UPDATE USER OBJECT ==================
+            function updateUserObject() {
+                const updatedUser = getCurrentUser();
+                if (updatedUser) {
+                    Object.assign(user, updatedUser);
+                }
+            }
+            
+            // Initial render
+            renderUserInfo();
+            
+            // Show admin link only if user is admin
+            const adminLink = document.getElementById("admin-link");
+            if (isAdmin()) {
+                adminLink.classList.remove("hidden");
+            }
+            
+            // Update user object periodically (for VIP status changes)
+            setInterval(() => {
+                updateUserObject();
+                renderUserInfo();
+            }, 5000);
         }
     </script>
 </body>

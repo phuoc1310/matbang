@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thanh toán thành công - SpaceRent</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "primary-hover": "#0f6bd0",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#1e293b",
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Manrope', sans-serif; }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark min-h-screen flex items-center justify-center p-4">
+    <div class="max-w-md w-full">
+        <div class="bg-surface-light dark:bg-surface-dark rounded-xl shadow-2xl p-8 text-center">
+            <div class="mb-6">
+                <span class="material-symbols-outlined text-green-500 text-7xl">check_circle</span>
+            </div>
+            <h1 class="text-2xl font-bold text-slate-900 dark:text-white mb-2">Thanh toán thành công!</h1>
+            <p class="text-slate-600 dark:text-slate-400 mb-6">VIP của bạn đã được kích hoạt thành công.</p>
+            <div id="loading" class="mb-6">
+                <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary mb-2"></div>
+                <p class="text-sm text-slate-500 dark:text-slate-400">Đang xử lý...</p>
+            </div>
+            <div id="content" class="hidden">
+                <div class="flex flex-col gap-3">
+                    <button onclick="window.location.href='Trangchu.html'" class="w-full px-6 py-3 bg-primary hover:bg-primary-hover text-white rounded-lg font-semibold transition-colors">
+                        Về trang chủ
+                    </button>
+                    <button onclick="window.location.href='taikhoan.html'" class="w-full px-6 py-3 bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 rounded-lg font-semibold transition-colors">
+                        Về trang tài khoản
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- PayOS SDK - Phải load trước các script khác -->
+    <script src="https://cdn.payos.vn/payos-checkout/v1/stable/payos-initialize.js"></script>
+    <script src="asset/js/auth.js"></script>
+    <script src="asset/js/vip.js"></script>
+    <script>
+        // Đợi PayOS SDK load xong
+        function waitForPayOS(callback, maxAttempts = 50) {
+            if (typeof PayOS !== 'undefined') {
+                callback();
+            } else if (maxAttempts > 0) {
+                setTimeout(() => waitForPayOS(callback, maxAttempts - 1), 100);
+            } else {
+                console.warn('PayOS SDK không load được. Tiếp tục với demo mode.');
+                callback();
+            }
+        }
+        
+        waitForPayOS(() => {
+            const script = document.createElement('script');
+            script.src = 'asset/js/payos-demo.js';
+            document.body.appendChild(script);
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const orderCode = urlParams.get('orderCode');
+            
+            if (!orderCode) {
+                document.getElementById('loading').innerHTML = '<p class="text-red-500">Không tìm thấy mã đơn hàng.</p>';
+                return;
+            }
+            
+            // Xử lý callback từ PayOS
+            try {
+                // Verify payment trước khi kích hoạt VIP
+                const verification = await verifyPayOSPayment(orderCode, 'success');
+                
+                if (verification.success) {
+                    // Chỉ kích hoạt VIP khi verify thành công
+                    const result = await handlePayOSCallback(orderCode, 'success');
+                    
+                    document.getElementById('loading').classList.add('hidden');
+                    document.getElementById('content').classList.remove('hidden');
+                    
+                    if (!result.success) {
+                        document.querySelector('h1').textContent = 'Có lỗi xảy ra';
+                        document.querySelector('p').textContent = result.message || 'Không thể kích hoạt VIP. Vui lòng liên hệ hỗ trợ.';
+                    }
+                } else {
+                    // Verify thất bại - không kích hoạt VIP
+                    document.getElementById('loading').classList.add('hidden');
+                    document.querySelector('h1').textContent = 'Thanh toán chưa được xác nhận';
+                    document.querySelector('p').textContent = verification.message || 'Thanh toán của bạn chưa được xác nhận. Vui lòng liên hệ hỗ trợ.';
+                    document.getElementById('content').classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('loading').classList.add('hidden');
+                document.querySelector('h1').textContent = 'Có lỗi xảy ra';
+                document.querySelector('p').textContent = 'Không thể xác minh thanh toán. Vui lòng liên hệ hỗ trợ.';
+                document.getElementById('content').classList.remove('hidden');
+            }
+        });
+    </script>
+</body>
+</html>

@@ -426,6 +426,10 @@
                 messageContainer.classList.add("hidden");
             }
             
+            // ================== INITIALIZE ==================
+            // Khởi tạo storage và tạo admin mặc định nếu chưa có
+            initUsersStorage();
+            
             // ================== LOGIN FORM ==================
             const loginFormEl = document.getElementById("login-form");
             const loginBtn = document.getElementById("login-btn");
@@ -453,7 +457,7 @@
                     showMessage(result.message, "success");
                     // Redirect sau 0.8 giây (mượt mà hơn)
                     setTimeout(() => {
-                        window.location.href = "taikhoan.html";
+                        window.location.href = "Trangchu.html";
                     }, 800);
                 } else {
                     showMessage(result.message, "error");
@@ -516,8 +520,8 @@
             
             // ================== CHECK IF ALREADY LOGGED IN ==================
             if (isLoggedIn()) {
-                // Nếu đã đăng nhập, redirect đến trang tài khoản
-                window.location.href = "taikhoan.html";
+                // Nếu đã đăng nhập, redirect đến trang chủ
+                window.location.href = "Trangchu.html";
             }
             
             // ================== LINK TO HOME ==================
