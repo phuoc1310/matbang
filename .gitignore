@@ -1,3 +1,4 @@
 .vscode/
 .specstory/
 backend/venv/
+backend/venv/.env
