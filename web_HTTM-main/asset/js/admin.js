@@ -553,6 +553,436 @@ function setupEventListeners() {
             showMessage('Có lỗi xảy ra: ' + result.message, 'error');
         }
     });
+    
+    // Tab navigation
+    document.querySelectorAll('.admin-tab').forEach(tab => {
+        tab.addEventListener('click', () => {
+            const tabName = tab.dataset.tab;
+            switchTab(tabName);
+        });
+    });
+    
+    // Contact filter
+    const filterContactStatus = document.getElementById('filter-contact-status');
+    if (filterContactStatus) {
+        filterContactStatus.addEventListener('change', () => {
+            loadContacts();
+        });
+    }
+    
+    // Feedback filter
+    const filterFeedbackStatus = document.getElementById('filter-feedback-status');
+    if (filterFeedbackStatus) {
+        filterFeedbackStatus.addEventListener('change', () => {
+            loadFeedbacks();
+        });
+    }
+    
+    // Contact modal close
+    document.querySelectorAll('.close-contact-modal').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.getElementById('contact-modal').classList.add('hidden');
+        });
+    });
+    
+    // Feedback modal close
+    document.querySelectorAll('.close-feedback-modal').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.getElementById('feedback-modal').classList.add('hidden');
+        });
+    });
+}
+
+// ================== TAB MANAGEMENT ==================
+function switchTab(tabName) {
+    // Update tab buttons
+    document.querySelectorAll('.admin-tab').forEach(tab => {
+        if (tab.dataset.tab === tabName) {
+            tab.classList.add('border-primary', 'text-primary');
+            tab.classList.remove('border-transparent', 'text-slate-600', 'dark:text-slate-400');
+        } else {
+            tab.classList.remove('border-primary', 'text-primary');
+            tab.classList.add('border-transparent', 'text-slate-600', 'dark:text-slate-400');
+        }
+    });
+    
+    // Show/hide tab content
+    document.querySelectorAll('.admin-tab-content').forEach(content => {
+        content.classList.add('hidden');
+    });
+    
+    const activeTab = document.getElementById(`tab-${tabName}`);
+    if (activeTab) {
+        activeTab.classList.remove('hidden');
+    }
+    
+    // Load data for active tab
+    if (tabName === 'contacts') {
+        loadContacts();
+    } else if (tabName === 'feedbacks') {
+        loadFeedbacks();
+    }
+}
+
+// ================== CONTACTS MANAGEMENT ==================
+function loadContacts() {
+    if (typeof getContacts !== 'function') {
+        console.error('contact.js chưa được load');
+        return;
+    }
+    
+    const contacts = getContacts();
+    const filterStatus = document.getElementById('filter-contact-status')?.value || 'all';
+    
+    let filteredContacts = contacts;
+    if (filterStatus !== 'all') {
+        filteredContacts = contacts.filter(c => c.status === filterStatus);
+    }
+    
+    // Sort by date (newest first)
+    filteredContacts.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    
+    renderContacts(filteredContacts);
+}
+
+function renderContacts(contacts) {
+    const tbody = document.getElementById('contacts-table-body');
+    if (!tbody) return;
+    
+    if (contacts.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="7" class="px-6 py-8 text-center text-slate-500 dark:text-slate-400">
+                    <span class="material-symbols-outlined text-4xl mb-2 block">inbox</span>
+                    Chưa có liên hệ nào
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    tbody.innerHTML = contacts.map(contact => {
+        const date = new Date(contact.createdAt).toLocaleDateString('vi-VN', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        
+        const statusColors = {
+            pending: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
+            processed: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
+            resolved: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
+        };
+        
+        const statusTexts = {
+            pending: 'Chưa xử lý',
+            processed: 'Đã xử lý',
+            resolved: 'Đã giải quyết'
+        };
+        
+        const subjectTexts = {
+            tuvan: 'Tư vấn tìm mặt bằng',
+            dangtin: 'Hỗ trợ đăng tin',
+            vip: 'Gói VIP',
+            kythuat: 'Hỗ trợ kỹ thuật',
+            khac: 'Khác'
+        };
+        
+        return `
+            <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                <td class="px-6 py-4 text-sm">${escapeHtml(contact.fullName)}</td>
+                <td class="px-6 py-4 text-sm">${escapeHtml(contact.email)}</td>
+                <td class="px-6 py-4 text-sm">${contact.phone || '-'}</td>
+                <td class="px-6 py-4 text-sm">${subjectTexts[contact.subject] || contact.subject}</td>
+                <td class="px-6 py-4">
+                    <span class="px-2 py-1 rounded-full text-xs font-semibold ${statusColors[contact.status] || statusColors.pending}">
+                        ${statusTexts[contact.status] || 'Chưa xử lý'}
+                    </span>
+                </td>
+                <td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">${date}</td>
+                <td class="px-6 py-4 text-sm">
+                    <div class="flex gap-2">
+                        <button onclick="viewContact('${contact.id}')" class="text-primary hover:text-primary-dark transition-colors" title="Xem chi tiết">
+                            <span class="material-symbols-outlined">visibility</span>
+                        </button>
+                        ${contact.status !== 'resolved' ? `
+                            <button onclick="markContactProcessed('${contact.id}')" class="text-blue-600 hover:text-blue-700 transition-colors" title="Đánh dấu đã xử lý">
+                                <span class="material-symbols-outlined">check_circle</span>
+                            </button>
+                        ` : ''}
+                        <button onclick="deleteContactAdmin('${contact.id}')" class="text-red-600 hover:text-red-700 transition-colors" title="Xóa">
+                            <span class="material-symbols-outlined">delete</span>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function viewContact(id) {
+    if (typeof getContactById !== 'function') return;
+    
+    const contact = getContactById(id);
+    if (!contact) {
+        showMessage('Không tìm thấy liên hệ', 'error');
+        return;
+    }
+    
+    const modalContent = document.getElementById('contact-modal-content');
+    const date = new Date(contact.createdAt).toLocaleString('vi-VN');
+    const processedDate = contact.processedAt ? new Date(contact.processedAt).toLocaleString('vi-VN') : '-';
+    
+    const subjectTexts = {
+        tuvan: 'Tư vấn tìm mặt bằng',
+        dangtin: 'Hỗ trợ đăng tin',
+        vip: 'Gói VIP',
+        kythuat: 'Hỗ trợ kỹ thuật',
+        khac: 'Khác'
+    };
+    
+    modalContent.innerHTML = `
+        <div class="space-y-4">
+            <div>
+                <label class="text-sm font-semibold text-slate-600 dark:text-slate-400">Họ và tên</label>
+                <p class="text-slate-900 dark:text-white">${escapeHtml(contact.fullName)}</p>
+            </div>
+            <div>
+                <label class="text-sm font-semibold text-slate-600 dark:text-slate-400">Email</label>
+                <p class="text-slate-900 dark:text-white">${escapeHtml(contact.email)}</p>
+            </div>
+            ${contact.phone ? `
+                <div>
+                    <label class="text-sm font-semibold text-slate-600 dark:text-slate-400">Số điện thoại</label>
+                    <p class="text-slate-900 dark:text-white">${escapeHtml(contact.phone)}</p>
+                </div>
+            ` : ''}
+            <div>
+                <label class="text-sm font-semibold text-slate-600 dark:text-slate-400">Chủ đề</label>
+                <p class="text-slate-900 dark:text-white">${subjectTexts[contact.subject] || contact.subject}</p>
+            </div>
+            <div>
+                <label class="text-sm font-semibold text-slate-600 dark:text-slate-400">Nội dung</label>
+                <p class="text-slate-900 dark:text-white whitespace-pre-wrap">${escapeHtml(contact.content)}</p>
+            </div>
+            <div>
+                <label class="text-sm font-semibold text-slate-600 dark:text-slate-400">Trạng thái</label>
+                <p class="text-slate-900 dark:text-white">${contact.status === 'pending' ? 'Chưa xử lý' : contact.status === 'processed' ? 'Đã xử lý' : 'Đã giải quyết'}</p>
+            </div>
+            <div>
+                <label class="text-sm font-semibold text-slate-600 dark:text-slate-400">Ngày gửi</label>
+                <p class="text-slate-900 dark:text-white">${date}</p>
+            </div>
+            ${contact.processedAt ? `
+                <div>
+                    <label class="text-sm font-semibold text-slate-600 dark:text-slate-400">Ngày xử lý</label>
+                    <p class="text-slate-900 dark:text-white">${processedDate}</p>
+                </div>
+            ` : ''}
+        </div>
+    `;
+    
+    document.getElementById('contact-modal').classList.remove('hidden');
+}
+
+function markContactProcessed(id) {
+    if (typeof updateContactStatus !== 'function') return;
+    
+    const currentUser = getCurrentUser();
+    const result = updateContactStatus(id, 'processed', currentUser?.email || 'admin');
+    
+    if (result) {
+        showMessage('Đã đánh dấu liên hệ là đã xử lý', 'success');
+        loadContacts();
+    } else {
+        showMessage('Có lỗi xảy ra', 'error');
+    }
+}
+
+function deleteContactAdmin(id) {
+    if (confirm('Bạn có chắc chắn muốn xóa liên hệ này?')) {
+        if (typeof deleteContact !== 'function') return;
+        
+        const result = deleteContact(id);
+        if (result) {
+            showMessage('Đã xóa liên hệ thành công', 'success');
+            loadContacts();
+        } else {
+            showMessage('Có lỗi xảy ra khi xóa', 'error');
+        }
+    }
+}
+
+// ================== FEEDBACKS MANAGEMENT ==================
+function loadFeedbacks() {
+    if (typeof getFeedbacks !== 'function') {
+        console.error('feedback.js chưa được load');
+        return;
+    }
+    
+    const feedbacks = getFeedbacks();
+    const filterStatus = document.getElementById('filter-feedback-status')?.value || 'all';
+    
+    let filteredFeedbacks = feedbacks;
+    if (filterStatus !== 'all') {
+        filteredFeedbacks = feedbacks.filter(f => f.status === filterStatus);
+    }
+    
+    // Sort by date (newest first)
+    filteredFeedbacks.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+    
+    renderFeedbacks(filteredFeedbacks);
+}
+
+function renderFeedbacks(feedbacks) {
+    const tbody = document.getElementById('feedbacks-table-body');
+    if (!tbody) return;
+    
+    if (feedbacks.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="7" class="px-6 py-8 text-center text-slate-500 dark:text-slate-400">
+                    <span class="material-symbols-outlined text-4xl mb-2 block">feedback</span>
+                    Chưa có phản hồi nào
+                </td>
+            </tr>
+        `;
+        return;
+    }
+    
+    tbody.innerHTML = feedbacks.map(feedback => {
+        const date = new Date(feedback.createdAt).toLocaleDateString('vi-VN', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        
+        const stars = '⭐'.repeat(feedback.rating) + '☆'.repeat(5 - feedback.rating);
+        const commentPreview = feedback.comment.length > 50 
+            ? feedback.comment.substring(0, 50) + '...' 
+            : feedback.comment;
+        
+        return `
+            <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/50">
+                <td class="px-6 py-4 text-sm">
+                    <span class="text-lg">${stars}</span>
+                    <span class="text-xs text-slate-600 dark:text-slate-400 ml-2">(${feedback.rating}/5)</span>
+                </td>
+                <td class="px-6 py-4 text-sm">${escapeHtml(commentPreview)}</td>
+                <td class="px-6 py-4 text-sm">${feedback.suggestion ? escapeHtml(feedback.suggestion.substring(0, 30) + (feedback.suggestion.length > 30 ? '...' : '')) : '-'}</td>
+                <td class="px-6 py-4 text-sm">${feedback.email || '-'}</td>
+                <td class="px-6 py-4">
+                    <span class="px-2 py-1 rounded-full text-xs font-semibold ${feedback.status === 'pending' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300' : 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'}">
+                        ${feedback.status === 'pending' ? 'Chưa xem' : 'Đã xem'}
+                    </span>
+                </td>
+                <td class="px-6 py-4 text-sm text-slate-600 dark:text-slate-400">${date}</td>
+                <td class="px-6 py-4 text-sm">
+                    <div class="flex gap-2">
+                        <button onclick="viewFeedback('${feedback.id}')" class="text-primary hover:text-primary-dark transition-colors" title="Xem chi tiết">
+                            <span class="material-symbols-outlined">visibility</span>
+                        </button>
+                        ${feedback.status === 'pending' ? `
+                            <button onclick="markFeedbackReviewed('${feedback.id}')" class="text-blue-600 hover:text-blue-700 transition-colors" title="Đánh dấu đã xem">
+                                <span class="material-symbols-outlined">check_circle</span>
+                            </button>
+                        ` : ''}
+                        <button onclick="deleteFeedbackAdmin('${feedback.id}')" class="text-red-600 hover:text-red-700 transition-colors" title="Xóa">
+                            <span class="material-symbols-outlined">delete</span>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `;
+    }).join('');
+}
+
+function viewFeedback(id) {
+    if (typeof getFeedbackById !== 'function') return;
+    
+    const feedback = getFeedbackById(id);
+    if (!feedback) {
+        showMessage('Không tìm thấy phản hồi', 'error');
+        return;
+    }
+    
+    const modalContent = document.getElementById('feedback-modal-content');
+    const date = new Date(feedback.createdAt).toLocaleString('vi-VN');
+    const stars = '⭐'.repeat(feedback.rating) + '☆'.repeat(5 - feedback.rating);
+    
+    modalContent.innerHTML = `
+        <div class="space-y-4">
+            <div>
+                <label class="text-sm font-semibold text-slate-600 dark:text-slate-400">Đánh giá</label>
+                <p class="text-slate-900 dark:text-white text-xl">${stars} (${feedback.rating}/5)</p>
+            </div>
+            <div>
+                <label class="text-sm font-semibold text-slate-600 dark:text-slate-400">Nhận xét</label>
+                <p class="text-slate-900 dark:text-white whitespace-pre-wrap">${escapeHtml(feedback.comment)}</p>
+            </div>
+            ${feedback.suggestion ? `
+                <div>
+                    <label class="text-sm font-semibold text-slate-600 dark:text-slate-400">Gợi ý cải thiện</label>
+                    <p class="text-slate-900 dark:text-white whitespace-pre-wrap">${escapeHtml(feedback.suggestion)}</p>
+                </div>
+            ` : ''}
+            ${feedback.email ? `
+                <div>
+                    <label class="text-sm font-semibold text-slate-600 dark:text-slate-400">Email</label>
+                    <p class="text-slate-900 dark:text-white">${escapeHtml(feedback.email)}</p>
+                </div>
+            ` : ''}
+            <div>
+                <label class="text-sm font-semibold text-slate-600 dark:text-slate-400">Trạng thái</label>
+                <p class="text-slate-900 dark:text-white">${feedback.status === 'pending' ? 'Chưa xem' : 'Đã xem'}</p>
+            </div>
+            <div>
+                <label class="text-sm font-semibold text-slate-600 dark:text-slate-400">Ngày gửi</label>
+                <p class="text-slate-900 dark:text-white">${date}</p>
+            </div>
+        </div>
+    `;
+    
+    document.getElementById('feedback-modal').classList.remove('hidden');
+}
+
+function markFeedbackReviewed(id) {
+    if (typeof updateFeedbackStatus !== 'function') return;
+    
+    const currentUser = getCurrentUser();
+    const result = updateFeedbackStatus(id, 'reviewed', currentUser?.email || 'admin');
+    
+    if (result) {
+        showMessage('Đã đánh dấu phản hồi là đã xem', 'success');
+        loadFeedbacks();
+    } else {
+        showMessage('Có lỗi xảy ra', 'error');
+    }
+}
+
+function deleteFeedbackAdmin(id) {
+    if (confirm('Bạn có chắc chắn muốn xóa phản hồi này?')) {
+        if (typeof deleteFeedback !== 'function') return;
+        
+        const result = deleteFeedback(id);
+        if (result) {
+            showMessage('Đã xóa phản hồi thành công', 'success');
+            loadFeedbacks();
+        } else {
+            showMessage('Có lỗi xảy ra khi xóa', 'error');
+        }
+    }
+}
+
+// ================== ESCAPE HTML ==================
+function escapeHtml(text) {
+    const div = document.createElement('div');
+    div.textContent = text;
+    return div.innerHTML;
 }
 
 // ================== SHOW MESSAGE ==================

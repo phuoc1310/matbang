@@ -318,6 +318,8 @@
                 <div>
                     <h4 class="font-bold mb-4">Hỗ trợ</h4>
                     <ul class="space-y-2 text-sm text-text-sub-light dark:text-text-sub-dark">
+                        <li><a class="hover:text-primary" href="lienhe.html">Liên hệ</a></li>
+                        <li><a class="hover:text-primary" href="phanhoi.html">Gửi phản hồi</a></li>
                         <li><a class="hover:text-primary" href="#">Trung tâm trợ giúp</a></li>
                         <li><a class="hover:text-primary" href="#">Điều khoản sử dụng</a></li>
                         <li><a class="hover:text-primary" href="#">Chính sách bảo mật</a></li>
@@ -371,6 +373,36 @@
                 authLink.href = "taikhoan.html";
                 authLink.textContent = "Tài khoản";
             }
+        });
+    </script>
+
+    <!-- ================== CHATBOT AI WIDGET ================== -->
+    <link rel="stylesheet" href="asset/css/chatbot.css">
+    <button id="chatbot-toggle" aria-label="Mở chatbot hỗ trợ">
+        <span class="material-symbols-outlined">support_agent</span>
+    </button>
+    <div id="chatbot-container">
+        <div id="chatbot-header">
+            <h3>
+                <span class="material-symbols-outlined">smart_toy</span>
+                Trợ lý AI SpaceRent
+            </h3>
+            <button id="chatbot-close" aria-label="Đóng chatbot">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <div id="chatbot-messages"></div>
+        <div id="chatbot-input-container">
+            <textarea id="chatbot-input" placeholder="Nhập câu hỏi của bạn..." rows="1"></textarea>
+            <button id="chatbot-send" aria-label="Gửi tin nhắn">
+                <span class="material-symbols-outlined">send</span>
+            </button>
+        </div>
+    </div>
+    <script src="asset/js/chatbot.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            initChatbot();
         });
     </script>
 
