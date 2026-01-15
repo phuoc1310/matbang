@@ -1,15 +1,15 @@
 // ================= GLOBAL STATE =================
-// TODO: Sau này state này có thể sync với backend hoặc Redis
-
 window.rawData = window.rawData || [];
 window.filteredData = window.filteredData || [];
 window.currentPage = window.currentPage || 1;
+window.PAGE_SIZE = window.PAGE_SIZE || 9; // Mặc định 9 cho tìm kiếm
 
-window.filterState = window.filterState || {
+window.__SEARCH_STATE__ = window.__SEARCH_STATE__ || {
   keyword: "",
+  city: "",
   minPrice: 0,
-  maxPrice: Infinity,
+  maxPrice: 20000000000,
   areas: []
 };
 
-window.PAGE_SIZE = window.PAGE_SIZE || 6;
+console.log("📊 Global state initialized");

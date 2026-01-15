@@ -8,62 +8,75 @@ const PORT = 3033;
 
 app.use(cors());
 app.use(express.json());
-
 app.get("/api/ads", async (req, res) => {
   try {
-    const region_v2 = req.query.region_v2 || 12000;
-
-    // 👇 mặc định 100, nhưng bạn có thể gọi ?limit=100
-    const limit = Math.min(Number(req.query.limit || 100), 100);
-    const page = Math.max(Number(req.query.page || 1), 1);
+    const page = Number(req.query.page || 1);
+    const limit = Math.min(Number(req.query.limit || 20), 50);
     const offset = (page - 1) * limit;
+    const q = req.query.q || "";
+    const city = req.query.city || ""; // Nhận tham số 'city' từ frontend (hcm, hn, dn, bd)
 
-    const url =
-      `https://gateway.chotot.com/v1/public/ad-listing` +
-      `?cg=1040&region_v2=${region_v2}&limit=${limit}&offset=${offset}`;
+    console.log(`Fetching ads for city: ${city}, keyword: ${q}`);
 
-    const r = await fetch(url, {
-      headers: {
-        "User-Agent": "Mozilla/5.0",
-        "Accept": "application/json",
-      },
-    });
+    // 🔥 QUAN TRỌNG: Ánh xạ mã thành phố của bạn sang region_v2 của Chợ Tốt
+    const regionMap = {
+      'hcm': '13000', // TP.HCM
+      'hn': '12000',  // Hà Nội
+      'dn': '15000',  // Đà Nẵng
+      'bd': '11000'   // Bình Dương
+    };
+    const regionCode = regionMap[city] || ''; // Lấy mã vùng, nếu không có thì để rỗng (lấy toàn quốc)
 
-    if (!r.ok) {
-      return res.status(r.status).json({ error: `ChoTot error ${r.status}` });
+    // Xây dựng URL gọi API Chợ Tốt
+    let url = `https://gateway.chotot.com/v1/public/ad-listing` +
+      `?cg=1000` + // Mặt bằng, văn phòng
+      `&limit=${limit}` +
+      `&offset=${offset}` +
+      `&st=s,k`;
+
+    // 🔥 THÊM ĐIỀU KIỆN LỌC THEO VÙNG NẾU CÓ
+    if (regionCode) {
+      url += `&region_v2=${regionCode}`;
+      console.log(`Filtering by region_v2: ${regionCode} for city: ${city}`);
     }
 
-    const json = await r.json();
-    res.json({ ads: json.ads || [], page, limit });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+    // Thêm từ khóa tìm kiếm nếu có
+    if (q.trim()) {
+      url += `&q=${encodeURIComponent(q)}`;
+    }
 
-app.get("/api/ads/:id", async (req, res) => {
-  const id = req.params.id;
+    console.log("Final URL to fetch:", url);
 
-  const url = `https://gateway.chotot.com/v1/public/ad-listing?ad_id=${id}`;
-
-  try {
     const r = await fetch(url, {
-      headers: {
-        "User-Agent": "Mozilla/5.0",
-        Accept: "application/json",
-      },
+      headers: { "User-Agent": "Mozilla/5.0" },
     });
 
     const json = await r.json();
-    const item = json.ads?.[0];
+    // Trả về kết quả
+    res.json({ ads: json.ads || [] });
 
-    if (!item) return res.status(404).json({ error: "Not found" });
-
-    res.json(item);
   } catch (e) {
-    res.status(500).json({ error: "Fetch detail failed" });
+    console.error(e);
+    res.status(500).json({ error: "Server error" });
   }
 });
+// ✅ DETAIL DÙNG list_id
+app.get("/api/ads/:listId", async (req, res) => {
+  const { listId } = req.params;
 
+  const url =
+    `https://gateway.chotot.com/v1/public/ad-listing?list_id=${listId}&cg=1000`;
+
+  const r = await fetch(url, {
+    headers: { "User-Agent": "Mozilla/5.0" },
+  });
+
+  const json = await r.json();
+  const item = json.ads?.[0];
+  if (!item) return res.status(404).json({ error: "Not found" });
+
+  res.json(item);
+});
 
 app.use(express.static("public"));
 
