@@ -9,7 +9,11 @@ return new class extends Migration
     public function up()
     {
         Schema::table('properties', function (Blueprint $table) {
-            $table->softDeletes();
+            // deleted_at đã được thêm trong create_properties_table migration
+            // Migration này giữ lại để tương thích với các phiên bản trước
+            if (!Schema::hasColumn('properties', 'deleted_at')) {
+                $table->softDeletes();
+            }
         });
     }
 
