@@ -1,6 +1,7 @@
 import { fetchDetail } from "./api.js";
 import { renderImages } from "./render.js";
-
+import { addInterest } from "./auth/firebaseService.js";
+import { auth } from "./auth/firebase.js";
 let map;
 let currentItem = null;
 
@@ -81,53 +82,52 @@ function drawRoute(geometry) {
 
 // ===== MAIN LOGIC =====
 document.addEventListener("DOMContentLoaded", async () => {
-  const params = new URLSearchParams(window.location.search);
   const id = new URLSearchParams(location.search).get("id");
-
   if (!id) return;
+
   const item = await fetchDetail(id);
 
   if (!item) {
     document.getElementById("title").textContent = "Tin không còn khả dụng";
     document.getElementById("description").innerHTML = `
-    <p class="text-red-500 font-semibold">
-      Tin này có thể đã bị gỡ hoặc hết hạn.
-    </p>
-    <a href="Trangchu.html" class="underline">
-      ← Quay lại trang chủ
-    </a>
-  `;
+      <p class="text-red-500 font-semibold">
+        Tin này có thể đã bị gỡ hoặc hết hạn.
+      </p>
+      <a href="Trangchu.html" class="underline">
+        ← Quay lại trang chủ
+      </a>
+    `;
     return;
   }
 
+  /* 🔥 GHI NHẬN VIEW – CHỈ 1 LẦN */
+  try {
+    const uid = auth.currentUser?.uid || "guest";
+    await addInterest(item.id, uid, "view");
+  } catch (e) {
+    console.warn("Không thể ghi nhận lượt xem", e);
+  }
 
-  // CHỈ render khi item tồn tại
-  renderImages(item);
-
-
-  // 2. 🔥 CHẠY HÀM SỬA LỖI VỊ TRÍ
-  // item = await smartFixLocation(item);
-
-  // 3. Render giao diện
+  /* ===== RENDER ===== */
   currentItem = item;
   window.currentListing = item;
 
-  renderImages(item);
+  renderImages(item); // ✅ CHỈ GỌI 1 LẦN
+
   document.getElementById("title").textContent = item.title;
   document.getElementById("location").textContent = item.address;
   document.getElementById("price").textContent = item.price_string;
-  document.getElementById("area").textContent = item.area_m2 ? `${item.area_m2} m²` : "—";
+  document.getElementById("area").textContent =
+    item.area_m2 ? `${item.area_m2} m²` : "—";
   document.getElementById("detail-seller").textContent = item.seller;
-  document.getElementById("detail-rating").textContent = item.rating ? `⭐ ${item.rating}` : "Chưa có đánh giá";
+  document.getElementById("detail-rating").textContent =
+    item.rating ? `⭐ ${item.rating}` : "Chưa có đánh giá";
 
   document.getElementById("description").innerHTML = `
     <p class="font-bold">Địa chỉ:</p> <p>${item.address}</p>
-    <p class="mt-2 text-gray-600">
-      ${item.isFixed ? '<i>Vị trí trên bản đồ đã được hệ thống tự động điều chỉnh theo địa chỉ.</i>' : ''}
-    </p>
   `;
 
-  // 4. Render Bản đồ
+  /* ===== MAP ===== */
   if (item.lat && item.lng && window.maplibregl) {
     map = new maplibregl.Map({
       container: "vietmap",
@@ -135,11 +135,6 @@ document.addEventListener("DOMContentLoaded", async () => {
       center: [item.lng, item.lat],
       zoom: 15
     });
-
-    new maplibregl.Marker({ color: "#ea4335" })
-      .setLngLat([item.lng, item.lat])
-      .setPopup(new maplibregl.Popup().setHTML(`<b>${item.title}</b>`))
-      .addTo(map);
 
     new maplibregl.Marker({ color: "#ea4335" })
       .setLngLat([item.lng, item.lat])
@@ -157,6 +152,7 @@ document.addEventListener("DOMContentLoaded", async () => {
       </div>`;
   }
 });
+
 
 // ===== GLOBAL FUNCTIONS =====
 window.routeToListing = async function () {
@@ -190,7 +186,7 @@ window.routeToListing = async function () {
 
     btn.innerHTML = originalText;
     btn.disabled = false;
-    
+
   } catch (e) {
     alert("Lỗi: " + e.message);
     document.getElementById("btnRoute").disabled = false;

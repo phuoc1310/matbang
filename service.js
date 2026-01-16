@@ -2,6 +2,18 @@
 import "dotenv/config";
 import express from "express";
 import cors from "cors";
+import admin from "firebase-admin";
+import fs from "fs";
+
+const serviceAccount = JSON.parse(
+  fs.readFileSync("./key_firebase/serviceAccountKey.json", "utf8")
+);
+if (!admin.apps.length) {
+  admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount),
+  });
+}
+const db = admin.firestore();
 
 const app = express();
 const PORT = 3033;
@@ -82,4 +94,58 @@ app.use(express.static("public"));
 
 app.listen(PORT, () => {
   console.log(`Server running at http://localhost:${PORT}/trangchu.html`);
+});
+
+app.post("/api/notify/daily", async (req, res) => {
+  const userSnap = await db
+    .collection("users")
+    .where("role", "!=", "admin")
+    .get();
+
+  const users = userSnap.docs
+    .map(doc => {
+      const d = doc.data();
+      if (!d.email) return null;
+      return {
+        to_email: d.email,
+        name: d.displayName || d.name || "bạn",
+      };
+    })
+    .filter(Boolean);
+
+
+  const adsRes = await fetch(
+    "http://localhost:3033/api/ads?page=1&limit=5",
+    { headers: { "User-Agent": "Mozilla/5.0" } }
+  );
+
+  const adsJson = await adsRes.json();
+  const products = adsJson.ads || [];
+
+  const productHtml = products.map(p => `
+  <li>
+    <b>${p.subject || "Không tiêu đề"}</b><br/>
+    Giá: ${p.price_string || "Thoả thuận"}<br/>
+    Khu vực: ${p.area_name || ""}, ${p.region_name || ""}
+  </li>
+`).join("");
+  res.json({
+    subject: "Thông báo BI hằng ngày - SpaceHub",
+    users,
+    products, // để debug nếu cần
+    email_content: `
+    <h3>Xin chào,</h3>
+    <p>Dưới đây là các mặt bằng mới hôm nay:</p>
+    <ul>${productHtml}</ul>
+    <p>Thời gian: ${new Date().toLocaleString("vi-VN")}</p>
+    <p>SpaceHub BI System</p>
+  `
+  });
+
+
+});
+
+
+app.get("/", (req, res) => {
+  res.sendFile(process.cwd() + "/public/trangchu.html");
 });
