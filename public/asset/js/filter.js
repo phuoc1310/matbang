@@ -1,5 +1,6 @@
 import { renderPage } from "./render.js";
 import { runBIAnalysis } from "./bi/biProcessor.js";
+import { getInterestCountMap } from "./auth/firebaseService.js";
 
 /* ================= UTILS ================= */
 function normalizeText(s = "") {
@@ -52,7 +53,7 @@ function collectFilterState() {
 
 /* ================= APPLY FILTER ================= */
 /* ================= APPLY FILTER ================= */
-export function applyFilter() {
+export async function applyFilter() {
   console.log("🔄 Applying filter...");
 
   if (!location.pathname.includes("timkiem")) {
@@ -149,7 +150,12 @@ export function applyFilter() {
       score: biMap.get(item.id)?.score ?? 0.5,
       level: biMap.get(item.id)?.level ?? "Bình thường"
     }));
+    const interestMap = await getInterestCountMap();
 
+    filtered = filtered.map(item => ({
+      ...item,
+      interests: interestMap[item.id] || 0
+    }));
 
     /* ===== 3. RENDER ===== */
     window.currentPage = 1;
@@ -165,4 +171,4 @@ export function applyFilter() {
       .getElementById("applyFilterBtn")
       ?.addEventListener("click", applyFilter);
   });
-  };
+};

@@ -1,10 +1,14 @@
-// public/asset/js/trangchu.js
-import { onAuthStateChanged, signOut } from
-  "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
-import { doc, getDoc } from
-  "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+import {
+  onAuthStateChanged,
+  signOut
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
-import { auth, db } from "./auth/firebase.js";
+import {
+  doc,
+  getDoc
+} from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+import { auth, firestore } from "./auth/firebase.js";
 import { fetchAllData } from "./api.js";
 import { renderPage } from "./render.js";
 import { runBIAnalysis } from "./bi/biProcessor.js";

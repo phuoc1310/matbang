@@ -1,5 +1,6 @@
 // public/asset/js/api.js
 import { scoreListing } from "./bi/scoring.js";
+import { saveListingForBI } from "./auth/firebaseService.js";
 
 function normalizeChoTotItem(item) {
   // Luôn đảm bảo có ít nhất một ảnh
@@ -109,6 +110,9 @@ let normalized = uniqueAds.map(item => normalizeChoTotItem(item));
 
 
   window.filteredData = [...window.rawData];
+  window.rawData.slice(0, 5).forEach(item => {
+  saveListingForBI(item);
+});
   return window.rawData;
 }
 
