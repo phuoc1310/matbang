@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+
+<html class="light" lang="vi">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>Trang chi tiết mặt bằng - RentHub</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&amp;family=Noto+Sans:wght@100..900&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <link
+        href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+        rel="stylesheet" />
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#1a2632",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"],
+                        "body": ["Noto Sans", "sans-serif"],
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+    <style>
+        /* Custom scrollbar for better aesthetic */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        .dark ::-webkit-scrollbar-thumb {
+            background-color: #334155;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-background-light dark:bg-background-dark text-[#0d141b] dark:text-[#e0e0e0] font-display antialiased flex flex-col min-h-screen transition-colors duration-200">
+    <!-- Navbar -->
+    <header
+        class="sticky top-0 z-50 bg-surface-light dark:bg-surface-dark border-b border-[#e7edf3] dark:border-gray-800 px-4 lg:px-10 py-3 shadow-sm">
+        <div class="max-w-[1280px] mx-auto flex items-center justify-between gap-4">
+            <div class="flex items-center gap-8">
+                <a class="flex items-center gap-3 text-[#0d141b] dark:text-white hover:opacity-80 transition-opacity"
+                    href="#">
+                    <div class="size-8 text-primary">
+                        <svg class="w-full h-full" fill="none" viewbox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+                            <path clip-rule="evenodd"
+                                d="M39.475 21.6262C40.358 21.4363 40.6863 21.5589 40.7581 21.5934C40.7876 21.655 40.8547 21.857 40.8082 22.3336C40.7408 23.0255 40.4502 24.0046 39.8572 25.2301C38.6799 27.6631 36.5085 30.6631 33.5858 33.5858C30.6631 36.5085 27.6632 38.6799 25.2301 39.8572C24.0046 40.4502 23.0255 40.7407 22.3336 40.8082C21.8571 40.8547 21.6551 40.7875 21.5934 40.7581C21.5589 40.6863 21.4363 40.358 21.6262 39.475C21.8562 38.4054 22.4689 36.9657 23.5038 35.2817C24.7575 33.2417 26.5497 30.9744 28.7621 28.762C30.9744 26.5497 33.2417 24.7574 35.2817 23.5037C36.9657 22.4689 38.4054 21.8562 39.475 21.6262ZM4.41189 29.2403L18.7597 43.5881C19.8813 44.7097 21.4027 44.9179 22.7217 44.7893C24.0585 44.659 25.5148 44.1631 26.9723 43.4579C29.9052 42.0387 33.2618 39.5667 36.4142 36.4142C39.5667 33.2618 42.0387 29.9052 43.4579 26.9723C44.1631 25.5148 44.659 24.0585 44.7893 22.7217C44.9179 21.4027 44.7097 19.8813 43.5881 18.7597L29.2403 4.41187C27.8527 3.02428 25.8765 3.02573 24.2861 3.36776C22.6081 3.72863 20.7334 4.58419 18.8396 5.74801C16.4978 7.18716 13.9881 9.18353 11.5858 11.5858C9.18354 13.988 7.18717 16.4978 5.74802 18.8396C4.58421 20.7334 3.72865 22.6081 3.36778 24.2861C3.02574 25.8765 3.02429 27.8527 4.41189 29.2403Z"
+                                fill="currentColor" fill-rule="evenodd"></path>
+                        </svg>
+                    </div>
+                    <h2 href="Trangchu.html" class="text-xl font-bold leading-tight tracking-[-0.015em]">RentHub</h2>
+                </a>
+                <div
+                    class="hidden md:flex items-center bg-[#e7edf3] dark:bg-surface-dark border dark:border-gray-700 rounded-lg h-10 w-80 px-3 gap-2">
+                    <span class="material-symbols-outlined text-[#4c739a] dark:text-gray-400 text-xl">search</span>
+                    <input
+                        class="bg-transparent border-none outline-none text-sm w-full text-[#0d141b] dark:text-white placeholder-[#4c739a] focus:ring-0"
+                        placeholder="Tìm theo thành phố, quận, tên..." />
+                </div>
+            </div>
+            <div class="flex items-center gap-4 lg:gap-8">
+                <nav class="hidden lg:flex items-center gap-6">
+                    <a class="text-[#0d141b] dark:text-gray-300 text-sm font-medium hover:text-primary transition-colors"
+                        href="#">Thuê</a>
+                    <a class="text-[#0d141b] dark:text-gray-300 text-sm font-medium hover:text-primary transition-colors"
+                        href="#">Mua</a>
+                    <a class="text-[#0d141b] dark:text-gray-300 text-sm font-medium hover:text-primary transition-colors"
+                        href="#">Quản lý</a>
+                </nav>
+                <div class="flex gap-3">
+                    <button
+                        class="hidden sm:flex h-9 px-4 items-center justify-center rounded-lg bg-surface-light dark:bg-transparent dark:border dark:border-gray-600 text-[#0d141b] dark:text-white text-sm font-bold hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
+                        Đăng nhập
+                    </button>
+                    <button
+                        class="h-9 px-4 flex items-center justify-center rounded-lg bg-primary text-white text-sm font-bold hover:bg-blue-600 transition-colors shadow-md shadow-blue-200 dark:shadow-none">
+                        Đăng ký
+                    </button>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main class="flex-grow w-full max-w-[1280px] mx-auto px-4 lg:px-10 py-6">
+        <!-- Breadcrumbs -->
+        <nav class="text-sm text-slate-500 mb-4">
+            <a href="Trangchu.html" class="hover:text-primary">Trang chủ</a> /
+            <span>Thuê</span> /
+            <span id="bc-region"></span> /
+            <span id="bc-district" class="font-medium text-slate-900"></span>
+        </nav>
+
+        <!-- Gallery Section (1 Main + 4 Thumbnails style) -->
+        <section class="grid grid-cols-1 md:grid-cols-4 gap-2 h-[300px] md:h-[450px] mb-8 overflow-hidden rounded-xl">
+            <!-- Main Image -->
+            <div class="col-span-1 md:col-span-2 row-span-2 relative group cursor-pointer">
+                <div id="main-image"
+                    class="w-full h-full bg-cover bg-center transition-transform duration-500 group-hover:scale-105"
+                    data-alt="Modern spacious commercial office with large windows and sunlight"
+                    style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuBhgw7old0thWjzPteRVAeyFQVV_rk5icXCvBEdQFjEyNNALJE37I7Cjtjr3quKwyfWb-idsbsEQEU7t-NqSrkzF_T37QU0QtpG4ifiak_A_lQmJ7qVcEgPyvAa9KqKrdnOFHtx2ZCLzvGbIqmke4Vw3WLNb6kyS5Fc5g5T8pJVY6lJ_aOF7mRuA7BlmCYGZc2FIc8eYe6H5vJORY8H1xv-KBeaX_67HdWkd4BUMl_yqsE7aORe0dVofKLt8dd_I9fL3VZE75HFQUy5');">
+                </div>
+                <div class="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors"></div>
+            </div>
+            <!-- Side Images -->
+        </section>
+        <!-- Main Content Area -->
+        <div class="flex flex-col lg:flex-row gap-8">
+            <!-- Left Column: Details -->
+            <div class="flex-1 min-w-0">
+                <!-- Header Info -->
+                <div class="mb-6">
+                    <div class="flex flex-wrap gap-3 mb-3">
+                        <span
+                            class="px-3 py-1 rounded-full bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400 text-xs font-bold flex items-center gap-1">
+                            <span class="material-symbols-outlined text-sm">check_circle</span>
+                            Có sẵn
+                        </span>
+                        <span
+                            class="px-3 py-1 rounded-full bg-blue-100 text-primary dark:bg-blue-900/30 dark:text-blue-300 text-xs font-bold flex items-center gap-1">
+                            <span class="material-symbols-outlined text-sm">verified</span>
+                            Đã xác minh
+                        </span>
+                    </div>
+                    <h1 id="detail-title"
+                        class="text-3xl md:text-4xl font-extrabold text-[#0d141b] dark:text-white mb-2 leading-tight">
+                    </h1>
+                    <p id="detail-address"
+                        class="text-[#4c739a] dark:text-gray-400 text-base md:text-lg flex items-center gap-1">
+                        <span class="material-symbols-outlined text-xl"></span>
+
+                    </p>
+                </div>
+                <!-- Key Stats -->
+                <div
+                    class="bg-surface-light dark:bg-surface-dark rounded-xl p-6 border border-gray-100 dark:border-gray-800 shadow-sm flex flex-wrap justify-between gap-6 mb-8">
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-primary">
+                            <span class="material-symbols-outlined">square_foot</span>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider">
+                                Diện tích</p>
+                            <p id="detail-area" class="text-lg font-bold text-[#0d141b] dark:text-white"></p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-primary">
+                            <span class="material-symbols-outlined">meeting_room</span>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider">
+                                Loại phòng</p>
+                            <p class="text-lg font-bold text-[#0d141b] dark:text-white">Văn phòng</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-primary">
+                            <span class="material-symbols-outlined">bathroom</span>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider">WC
+                            </p>
+                            <p class="text-lg font-bold text-[#0d141b] dark:text-white">2 Phòng</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg text-primary">
+                            <span class="material-symbols-outlined">directions_car</span>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider">Chỗ
+                                để xe</p>
+                            <p class="text-lg font-bold text-[#0d141b] dark:text-white">Hầm rộng</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Description -->
+                <div class="mb-10">
+                    <h3 class="text-xl font-bold mb-4 text-[#0d141b] dark:text-white">Mô tả chi tiết</h3>
+                    <div
+                        class="prose prose-slate dark:prose-invert max-w-none text-[#4c739a] dark:text-gray-300 leading-relaxed">
+                        <p class="mb-4">
+                            Tòa nhà văn phòng hiện đại nằm ngay trung tâm Quận 1, vị trí đắc địa trên đường Nguyễn Huệ.
+                            Không gian được thiết kế tối ưu ánh sáng tự nhiên, tạo cảm giác thoáng đãng và năng động.
+                            Phù hợp cho các công ty startup, agency quảng cáo hoặc văn phòng đại diện nước ngoài.
+                        </p>
+                        <p class="mb-4">
+                            Hệ thống điều hòa trung tâm mới lắp đặt, thang máy tốc độ cao và an ninh 24/7. Tòa nhà có
+                            hầm để xe rộng rãi cho cả ô tô và xe máy. Xung quanh tập trung nhiều tiện ích như ngân hàng,
+                            nhà hàng cao cấp và trung tâm thương mại.
+                        </p>
+                        <button class="text-primary font-bold hover:underline flex items-center gap-1 mt-2">
+                            Xem thêm <span class="material-symbols-outlined text-sm">expand_more</span>
+                        </button>
+                    </div>
+                </div>
+                <!-- Amenities -->
+                <div class="mb-10 border-t border-gray-100 dark:border-gray-800 pt-8">
+                    <h3 class="text-xl font-bold mb-6 text-[#0d141b] dark:text-white">Tiện ích &amp; Đặc điểm</h3>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-y-4 gap-x-8">
+                        <div class="flex items-center gap-3 text-gray-700 dark:text-gray-300">
+                            <span class="material-symbols-outlined text-gray-400">wifi</span> Wifi tốc độ cao
+                        </div>
+                        <div class="flex items-center gap-3 text-gray-700 dark:text-gray-300">
+                            <span class="material-symbols-outlined text-gray-400">ac_unit</span> Điều hòa trung tâm
+                        </div>
+                        <div class="flex items-center gap-3 text-gray-700 dark:text-gray-300">
+                            <span class="material-symbols-outlined text-gray-400">elevator</span> Thang máy
+                        </div>
+                        <div class="flex items-center gap-3 text-gray-700 dark:text-gray-300">
+                            <span class="material-symbols-outlined text-gray-400">local_fire_department</span> PCCC tiêu
+                            chuẩn
+                        </div>
+                        <div class="flex items-center gap-3 text-gray-700 dark:text-gray-300">
+                            <span class="material-symbols-outlined text-gray-400">videocam</span> Camera an ninh
+                        </div>
+                        <div class="flex items-center gap-3 text-gray-700 dark:text-gray-300">
+                            <span class="material-symbols-outlined text-gray-400">cleaning_services</span> Dịch vụ vệ
+                            sinh
+                        </div>
+                    </div>
+                </div>
+                <!-- Interactive Map -->
+                <div class="mb-10 border-t border-gray-100 dark:border-gray-800 pt-8">
+                    <h3 class="text-xl font-bold mb-4 text-[#0d141b] dark:text-white">Vị trí trên bản đồ</h3>
+                    <div class="w-full h-[320px] rounded-xl overflow-hidden relative bg-gray-200">
+                        <div class="w-full h-full bg-cover bg-center" data-alt="Map view of District 1 Ho Chi Minh City"
+                            data-location="Ho Chi Minh City"
+                            style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCZl7b_hb___m2sf3HsOhk6CKI4OhmhLvPJD1YG5ZFwQttMCOPO0sU31PpH2nKQPTmUcxG62iJiB3KIH_GN0NqhzS24mbuAC9xwRtEg-Fp-LG6yRWwhBxNmZdP8VhID40yUG-6beHsHWfrpdNeu1XaNBKEMTYVbzVv_KCW6B2a_qzwWAdUwfDxAm1u2QRlK9Ylrli9U0DwIvToCf5saDfQXt-cer5cXfDL6Iy-_5sDjPEzfbgxoVj-ClSIx04XRurVuWhzQMySvwRJV');">
+                        </div>
+                        <div class="absolute inset-0 bg-black/10 flex items-center justify-center">
+                            <!-- Simulate map marker -->
+                            <div
+                                class="bg-primary text-white p-2 rounded-full shadow-lg border-2 border-white animate-bounce">
+                                <span class="material-symbols-outlined text-2xl">location_on</span>
+                            </div>
+                        </div>
+                        <button
+                            class="absolute bottom-4 right-4 bg-white dark:bg-surface-dark text-gray-800 dark:text-white px-4 py-2 rounded-lg shadow-md text-sm font-bold hover:bg-gray-50 transition-colors">
+                            Mở Google Maps
+                        </button>
+                    </div>
+                </div>
+                <!-- Reviews Section -->
+
+            </div>
+            <!-- Right Column: Sticky Sidebar -->
+            <div class="lg:w-[380px] shrink-0">
+                <div class="sticky top-24 flex flex-col gap-4">
+                    <!-- Booking/Contact Card -->
+                    <div
+                        class="bg-surface-light dark:bg-surface-dark rounded-xl shadow-lg border border-gray-100 dark:border-gray-800 p-6">
+                        <div class="mb-6">
+                            <p class="text-sm text-gray-500 dark:text-gray-400 font-medium mb-1">Giá thuê hàng tháng</p>
+                            <div class="flex items-baseline gap-1">
+                                <span id="detail-price" class="text-3xl font-black text-primary tracking-tight"></span>
+                            </div>
+                        </div>
+                        <!-- Agent Info -->
+                        <div
+                            class="flex items-center gap-4 mb-6 p-4 bg-gray-50 dark:bg-background-dark/50 rounded-lg border border-gray-100 dark:border-gray-800">
+                            <div class="w-14 h-14 rounded-full bg-cover bg-center border-2 border-white dark:border-gray-600 shadow-sm"
+                                data-alt="Portrait of real estate agent Sarah Nguyen"
+                                style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAR-9ElLXCG2mnlPSLaU-diNcz9jqKUPYCKz7Q_nIM9N5BN2_VEu-E1LPCrBbyuHUpyHqC0gahu0UIo3t3RYCiM0NSMzzPlWLwLJKIx0_Q2uDC9PPX4kUNDTrHIMqLvYc2IRHPqaLqBXcxez0Dm0pgSwF_cCS3MWMAZuS9BQbAE5CqT04NiVRpe3mayxNKGi5mE17kk9bezgOu-pfO-4MW5VA-rIqkHCzPKDquVYLFVM_LtvS9u5wnwl5pW5RGHD9qXxchrDOSW4bgx');">
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <h4 id="detail-seller"
+                                    class="font-bold text-[#0d141b] dark:text-white text-base truncate">
+                                </h4>
+                                <p class="text-xs text-gray-500 dark:text-gray-400 truncate">Senior Agent - RentHub
+                                    Premier</p>
+                                <div
+                                    class="flex items-center gap-1 text-xs text-yellow-600 dark:text-yellow-500 font-medium mt-1">
+                                    <span id="detail-rating" class="material-symbols-outlined text-sm">star</span>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-3">
+                            <button
+                                class="w-full bg-primary hover:bg-blue-600 text-white font-bold py-3.5 px-4 rounded-lg shadow-lg shadow-blue-200 dark:shadow-none transition-all transform active:scale-[0.98] flex items-center justify-center gap-2">
+                                <span class="material-symbols-outlined">call</span>
+                                Liên hệ ngay
+                            </button>
+                            <button
+                                class="w-full bg-white dark:bg-transparent border-2 border-primary text-primary hover:bg-blue-50 dark:hover:bg-blue-900/20 font-bold py-3.5 px-4 rounded-lg transition-colors flex items-center justify-center gap-2">
+                                <span class="material-symbols-outlined">calendar_month</span>
+                                Đặt lịch xem phòng
+                            </button>
+                        </div>
+                        <div class="mt-4 text-center">
+                            <p class="text-xs text-gray-400">Phản hồi trung bình trong vòng 15 phút</p>
+                        </div>
+                    </div>
+                    <!-- Safety Tip -->
+                    <div
+                        class="bg-blue-50 dark:bg-blue-900/10 p-4 rounded-xl border border-blue-100 dark:border-blue-900/30 flex gap-3">
+                        <div class="shrink-0 text-primary">
+                            <span class="material-symbols-outlined">security</span>
+                        </div>
+                        <div>
+                            <h5 class="font-bold text-sm text-[#0d141b] dark:text-blue-100 mb-1">An toàn giao dịch</h5>
+                            <p class="text-xs text-gray-600 dark:text-gray-400">Không bao giờ chuyển tiền đặt cọc trước
+                                khi bạn đã trực tiếp xem nhà và ký hợp đồng.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+    <!-- Simple Footer -->
+    <footer class="bg-white dark:bg-surface-dark border-t border-gray-200 dark:border-gray-800 py-8 mt-12">
+        <div class="max-w-[1280px] mx-auto px-4 lg:px-10 text-center">
+            <p class="text-sm text-gray-500 dark:text-gray-400">© 2023 RentHub Inc. All rights reserved.</p>
+        </div>
+    </footer>
+    <script src="asset/js/state.js"></script>
+    <script src="asset/js/api.js"></script>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            const params = new URLSearchParams(window.location.search);
+            const id = params.get("id");
+
+            if (!id) {
+                document.body.innerHTML = "<h2>Thiếu ID tin đăng</h2>";
+                return;
+            }
+
+            await fetchData();
+
+            const item = window.rawData.find(x => String(x.id) === String(id));
+            const regionEl = document.getElementById("bc-region");
+            const districtEl = document.getElementById("bc-district");
+
+            if (regionEl) regionEl.textContent = item.region || "";
+            if (districtEl) districtEl.textContent = item.district || "";
+
+            if (!item) {
+                document.body.innerHTML = "<h2>Không tìm thấy tin đăng</h2>";
+                return;
+            }
+
+            document.getElementById("detail-title").textContent = item.title;
+
+            document.getElementById("detail-price").textContent =
+                item.price_string || "Liên hệ";
+
+            document.getElementById("detail-address").textContent =
+                `${item.street}, ${item.ward}, ${item.district}, ${item.region}`;
+
+            document.getElementById("detail-area").textContent =
+                `${item.area_m2} m²`;
+
+            document.getElementById("detail-seller").textContent =
+                item.seller || "Đang cập nhật";
+
+            document.getElementById("detail-date").textContent =
+                item.date || "";
+
+            document.getElementById("detail-category").textContent =
+                item.category;
+
+            document.getElementById("detail-group").textContent =
+                item.group;
+
+            document.getElementById("detail-rating").textContent =
+                item.rating ? `${item.rating} ⭐` : "Chưa có";
+
+            // Ảnh
+            document.getElementById("main-image").style.backgroundImage =
+                `url('${item.image}')`;
+
+            // Map
+            document.getElementById("detail-map").src =
+                `https://www.google.com/maps?q=${item.lat},${item.lng}&output=embed`;
+
+        });
+    </script>
+
+
+
+
+</body>
+
+</html>
