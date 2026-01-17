@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html class="light" lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liên hệ - SpaceRent</title>
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap" rel="stylesheet" />
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "primary-dark": "#0f66bd",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#1e2936",
+                        "text-main-light": "#0d141b",
+                        "text-main-dark": "#e2e8f0",
+                        "text-sub-light": "#4c739a",
+                        "text-sub-dark": "#94a3b8",
+                        "border-light": "#e7edf3",
+                        "border-dark": "#334155",
+                    },
+                    fontFamily: {
+                        "display": ["Manrope", "sans-serif"]
+                    },
+                },
+            },
+        }
+    </script>
+</head>
+<body class="bg-background-light dark:bg-background-dark text-text-main-light dark:text-text-main-dark font-display antialiased min-h-screen flex flex-col">
+    <!-- Header -->
+    <header class="sticky top-0 z-50 bg-surface-light/95 dark:bg-surface-dark/95 backdrop-blur-md border-b border-border-light dark:border-border-dark">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <a href="Trangchu.html" class="flex items-center gap-2">
+                    <div class="size-8 text-primary flex items-center justify-center">
+                        <span class="material-symbols-outlined text-3xl">domain</span>
+                    </div>
+                    <h2 class="text-text-main-light dark:text-text-main-dark text-xl font-bold tracking-tight">SpaceRent</h2>
+                </a>
+                <nav class="hidden md:flex items-center gap-8">
+                    <a class="text-sm font-semibold hover:text-primary transition-colors" href="Trangchu.html">Trang chủ</a>
+                    <a class="text-sm font-semibold hover:text-primary transition-colors" href="timkiem.html">Thuê mặt bằng</a>
+                    <a class="text-sm font-semibold hover:text-primary transition-colors" href="timkiem.html">Cho thuê</a>
+                </nav>
+                <div class="flex gap-3">
+                    <a id="auth-link" href="dangnhap.html" class="hidden sm:flex h-9 items-center justify-center px-4 rounded-lg bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-bold transition-colors text-text-main-light dark:text-text-main-dark">
+                        Đăng nhập
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-grow">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="text-center mb-12">
+                <h1 class="text-4xl font-bold mb-4">Liên hệ với chúng tôi</h1>
+                <p class="text-lg text-text-sub-light dark:text-text-sub-dark">Chúng tôi luôn sẵn sàng lắng nghe và hỗ trợ bạn</p>
+            </div>
+
+            <!-- Contact Form -->
+            <div class="bg-surface-light dark:bg-surface-dark rounded-xl shadow-lg p-8 border border-border-light dark:border-border-dark">
+                <form id="contact-form" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Họ tên -->
+                        <div>
+                            <label for="fullName" class="block text-sm font-semibold mb-2">Họ và tên <span class="text-red-500">*</span></label>
+                            <input type="text" id="fullName" name="fullName" required
+                                class="w-full px-4 py-3 border border-border-light dark:border-border-dark rounded-lg bg-background-light dark:bg-background-dark focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
+                                placeholder="Nhập họ và tên của bạn">
+                        </div>
+
+                        <!-- Email -->
+                        <div>
+                            <label for="email" class="block text-sm font-semibold mb-2">Email <span class="text-red-500">*</span></label>
+                            <input type="email" id="email" name="email" required
+                                class="w-full px-4 py-3 border border-border-light dark:border-border-dark rounded-lg bg-background-light dark:bg-background-dark focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
+                                placeholder="example@email.com">
+                        </div>
+                    </div>
+
+                    <!-- Số điện thoại -->
+                    <div>
+                        <label for="phone" class="block text-sm font-semibold mb-2">Số điện thoại</label>
+                        <input type="tel" id="phone" name="phone"
+                            class="w-full px-4 py-3 border border-border-light dark:border-border-dark rounded-lg bg-background-light dark:bg-background-dark focus:outline-none focus:ring-2 focus:ring-primary transition-colors"
+                            placeholder="0123456789">
+                    </div>
+
+                    <!-- Chủ đề -->
+                    <div>
+                        <label for="subject" class="block text-sm font-semibold mb-2">Chủ đề <span class="text-red-500">*</span></label>
+                        <select id="subject" name="subject" required
+                            class="w-full px-4 py-3 border border-border-light dark:border-border-dark rounded-lg bg-background-light dark:bg-background-dark focus:outline-none focus:ring-2 focus:ring-primary transition-colors">
+                            <option value="">Chọn chủ đề</option>
+                            <option value="tuvan">Tư vấn tìm mặt bằng</option>
+                            <option value="dangtin">Hỗ trợ đăng tin</option>
+                            <option value="vip">Gói VIP</option>
+                            <option value="kythuat">Hỗ trợ kỹ thuật</option>
+                            <option value="khac">Khác</option>
+                        </select>
+                    </div>
+
+                    <!-- Nội dung -->
+                    <div>
+                        <label for="content" class="block text-sm font-semibold mb-2">Nội dung <span class="text-red-500">*</span></label>
+                        <textarea id="content" name="content" rows="6" required
+                            class="w-full px-4 py-3 border border-border-light dark:border-border-dark rounded-lg bg-background-light dark:bg-background-dark focus:outline-none focus:ring-2 focus:ring-primary transition-colors resize-none"
+                            placeholder="Nhập nội dung tin nhắn của bạn..."></textarea>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="flex justify-end">
+                        <button type="submit" id="submit-btn"
+                            class="px-8 py-3 bg-primary hover:bg-primary-dark text-white rounded-lg font-semibold transition-colors flex items-center gap-2">
+                            <span>Gửi liên hệ</span>
+                            <span class="material-symbols-outlined">send</span>
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Success Message -->
+                <div id="success-message" class="hidden mt-6 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-green-600 dark:text-green-400">check_circle</span>
+                        <div>
+                            <p class="font-semibold text-green-900 dark:text-green-200">Gửi thành công!</p>
+                            <p class="text-sm text-green-700 dark:text-green-300">Chúng tôi đã nhận được tin nhắn của bạn và sẽ phản hồi sớm nhất có thể.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Error Message -->
+                <div id="error-message" class="hidden mt-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                    <div class="flex items-center gap-3">
+                        <span class="material-symbols-outlined text-red-600 dark:text-red-400">error</span>
+                        <div>
+                            <p class="font-semibold text-red-900 dark:text-red-200">Có lỗi xảy ra</p>
+                            <p class="text-sm text-red-700 dark:text-red-300" id="error-text">Vui lòng thử lại sau.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Info -->
+            <div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-surface-light dark:bg-surface-dark rounded-xl p-6 border border-border-light dark:border-border-dark text-center">
+                    <div class="size-12 bg-primary/10 dark:bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="material-symbols-outlined text-primary text-2xl">mail</span>
+                    </div>
+                    <h3 class="font-semibold mb-2">Email</h3>
+                    <p class="text-sm text-text-sub-light dark:text-text-sub-dark">contact@spacerent.vn</p>
+                </div>
+                <div class="bg-surface-light dark:bg-surface-dark rounded-xl p-6 border border-border-light dark:border-border-dark text-center">
+                    <div class="size-12 bg-primary/10 dark:bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="material-symbols-outlined text-primary text-2xl">phone</span>
+                    </div>
+                    <h3 class="font-semibold mb-2">Hotline</h3>
+                    <p class="text-sm text-text-sub-light dark:text-text-sub-dark">1900 1234</p>
+                </div>
+                <div class="bg-surface-light dark:bg-surface-dark rounded-xl p-6 border border-border-light dark:border-border-dark text-center">
+                    <div class="size-12 bg-primary/10 dark:bg-primary/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <span class="material-symbols-outlined text-primary text-2xl">schedule</span>
+                    </div>
+                    <h3 class="font-semibold mb-2">Thời gian</h3>
+                    <p class="text-sm text-text-sub-light dark:text-text-sub-dark">24/7</p>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-surface-light dark:bg-surface-dark border-t border-border-light dark:border-border-dark pt-12 pb-8 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center">
+                <p class="text-sm text-text-sub-light dark:text-text-sub-dark">© 2024 SpaceRent Inc. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module" src="asset/js/auth/auth.js"></script>
+    <script src="asset/js/contact.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Cập nhật link Đăng nhập/Tài khoản
+            const authLink = document.getElementById("auth-link");
+            if (authLink && typeof isLoggedIn === "function" && isLoggedIn()) {
+                authLink.href = "taikhoan.html";
+                authLink.textContent = "Tài khoản";
+            }
+        });
+    </script>
+</body>
+</html>

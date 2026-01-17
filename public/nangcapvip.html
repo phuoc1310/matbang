@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nâng cấp VIP - SpaceRent</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#137fec",
+                        "primary-hover": "#0f6bd0",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#101922",
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#1e293b",
+                        "border-light": "#e2e8f0",
+                        "border-dark": "#334155",
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200..800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Manrope', sans-serif; }
+        
+        /* Gradient backgrounds */
+        .vip-gradient {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        
+        .gold-gradient {
+            background: linear-gradient(135deg, #f6d365 0%, #fda085 100%);
+        }
+        
+        /* Card hover effect */
+        .vip-card {
+            transition: all 0.3s ease;
+        }
+        
+        .vip-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+        
+        /* Popular badge animation */
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+        
+        .popular-badge {
+            animation: pulse 2s infinite;
+        }
+    </style>
+</head>
+<body class="bg-background-light dark:bg-background-dark min-h-screen">
+    <!-- Header -->
+    <header class="sticky top-0 z-50 bg-surface-light/95 dark:bg-surface-dark/95 backdrop-blur-md border-b border-border-light dark:border-border-dark">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <a href="Trangchu.html" class="flex items-center gap-2">
+                    <div class="size-8 text-primary flex items-center justify-center">
+                        <span class="material-symbols-outlined text-3xl">domain</span>
+                    </div>
+                    <h2 class="text-slate-900 dark:text-white text-xl font-bold tracking-tight">SpaceRent</h2>
+                </a>
+                <div class="flex gap-3">
+                    <a href="Trangchu.html" class="flex h-9 items-center justify-center px-4 rounded-lg bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-bold transition-colors text-slate-900 dark:text-white">
+                        <span class="material-symbols-outlined text-[18px] mr-2">home</span>
+                        Trang chủ
+                    </a>
+                    <a id="account-link" href="taikhoan.html" class="hidden flex h-9 items-center justify-center px-4 rounded-lg bg-primary hover:bg-primary-hover text-white text-sm font-bold transition-colors">
+                        <span class="material-symbols-outlined text-[18px] mr-2">person</span>
+                        Tài khoản
+                    </a>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="vip-gradient py-16 lg:py-24 relative overflow-hidden">
+        <div class="absolute inset-0 opacity-10">
+            <div class="absolute top-0 left-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
+            <div class="absolute bottom-0 right-0 w-96 h-96 bg-white rounded-full blur-3xl"></div>
+        </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+            <div class="text-center">
+                <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/20 backdrop-blur-sm rounded-full text-white mb-6">
+                    <span class="material-symbols-outlined text-yellow-300">workspace_premium</span>
+                    <span class="text-sm font-semibold">Trở thành thành viên VIP</span>
+                </div>
+                <h1 class="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6">
+                    Nâng cấp lên <span class="text-yellow-300">VIP</span><br/>
+                    Trải nghiệm đẳng cấp
+                </h1>
+                <p class="text-lg md:text-xl text-white/90 max-w-2xl mx-auto mb-8">
+                    Nhận ưu đãi độc quyền, ưu tiên hiển thị tin đăng và nhiều tính năng cao cấp khác
+                </p>
+                
+                <!-- VIP Status Card -->
+                <div id="vip-status-card" class="hidden max-w-md mx-auto bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20">
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center gap-3">
+                            <div class="w-12 h-12 rounded-full gold-gradient flex items-center justify-center">
+                                <span class="material-symbols-outlined text-white text-2xl">star</span>
+                            </div>
+                            <div class="text-left">
+                                <p class="text-white font-bold text-lg">Tài khoản VIP</p>
+                                <p id="vip-status-text" class="text-white/80 text-sm">Đang hoạt động</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-white/10 rounded-lg p-4 mb-4">
+                        <p class="text-white/70 text-xs mb-1">Thời gian còn lại</p>
+                        <p id="vip-days-left" class="text-white text-2xl font-bold">-- ngày</p>
+                    </div>
+                    <div class="bg-white/10 rounded-lg p-4">
+                        <p class="text-white/70 text-xs mb-1">Ngày hết hạn</p>
+                        <p id="vip-expiry-date" class="text-white font-semibold">--/--/----</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Benefits Section -->
+    <section class="py-16 bg-white dark:bg-surface-dark">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <h2 class="text-3xl font-bold text-center text-slate-900 dark:text-white mb-12">
+                Đặc quyền thành viên VIP
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="bg-surface-light dark:bg-slate-800 p-6 rounded-xl border border-border-light dark:border-border-dark">
+                    <div class="w-12 h-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mb-4">
+                        <span class="material-symbols-outlined text-blue-600 dark:text-blue-400 text-2xl">trending_up</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">Ưu tiên hiển thị</h3>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm">Tin đăng của bạn sẽ luôn hiển thị ở vị trí đầu tiên</p>
+                </div>
+                
+                <div class="bg-surface-light dark:bg-slate-800 p-6 rounded-xl border border-border-light dark:border-border-dark">
+                    <div class="w-12 h-12 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center mb-4">
+                        <span class="material-symbols-outlined text-purple-600 dark:text-purple-400 text-2xl">verified</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">Huy hiệu VIP</h3>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm">Thêm huy hiệu VIP vàng nổi bật vào hồ sơ</p>
+                </div>
+                
+                <div class="bg-surface-light dark:bg-slate-800 p-6 rounded-xl border border-border-light dark:border-border-dark">
+                    <div class="w-12 h-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mb-4">
+                        <span class="material-symbols-outlined text-green-600 dark:text-green-400 text-2xl">support_agent</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">Hỗ trợ ưu tiên</h3>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm">Được hỗ trợ nhanh chóng và ưu tiên</p>
+                </div>
+                
+                <div class="bg-surface-light dark:bg-slate-800 p-6 rounded-xl border border-border-light dark:border-border-dark">
+                    <div class="w-12 h-12 rounded-full bg-yellow-100 dark:bg-yellow-900/30 flex items-center justify-center mb-4">
+                        <span class="material-symbols-outlined text-yellow-600 dark:text-yellow-400 text-2xl">analytics</span>
+                    </div>
+                    <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">Thống kê chi tiết</h3>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm">Xem báo cáo và phân tích chi tiết về tin đăng</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section class="py-16 bg-background-light dark:bg-background-dark">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center mb-12">
+                <h2 class="text-3xl font-bold text-slate-900 dark:text-white mb-4">
+                    Chọn gói VIP phù hợp
+                </h2>
+                <p class="text-slate-600 dark:text-slate-400">
+                    Tất cả các gói đều bao gồm đầy đủ tính năng VIP
+                </p>
+            </div>
+
+            <!-- VIP Packages Grid -->
+            <div id="vip-packages" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <!-- Packages will be rendered here by JavaScript -->
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="py-16 bg-slate-900 dark:bg-slate-950">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full text-white mb-6">
+                <span class="material-symbols-outlined text-yellow-300">workspace_premium</span>
+                <span class="text-sm font-semibold">Cam kết hoàn tiền 100% nếu không hài lòng</span>
+            </div>
+            <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">
+                Sẵn sàng nâng cấp trải nghiệm?
+            </h2>
+            <p class="text-lg text-slate-300 mb-8">
+                Tham gia cùng hàng nghìn thành viên VIP đang sử dụng SpaceRent
+            </p>
+            <a href="#vip-packages" class="inline-flex items-center gap-2 px-8 py-4 bg-yellow-400 hover:bg-yellow-500 text-slate-900 rounded-lg font-bold text-lg transition-colors shadow-lg">
+                <span class="material-symbols-outlined">rocket_launch</span>
+                Chọn gói VIP ngay
+            </a>
+        </div>
+    </section>
+
+    <!-- PayOS SDK -->
+    <script src="https://cdn.payos.vn/payos-checkout/v1/stable/payos-initialize.js" 
+            onerror="console.error('PayOS SDK load failed'); window.PayOSLoadError = true;"
+            onload="console.log('PayOS SDK loaded'); window.PayOSLoaded = true;"></script>
+    
+    <!-- Scripts -->
+    <script type="module" src="asset/js/auth/auth.js"></script>
+    <script src="asset/js/vip.js"></script>
+    
+    <script>
+        // Wait for PayOS SDK
+        function waitForPayOS(callback, maxAttempts = 60) {
+            const isPayOSAvailable = typeof PayOS !== 'undefined' || typeof window.PayOS !== 'undefined';
+            
+            if (isPayOSAvailable || window.PayOSLoaded) {
+                callback();
+            } else if (window.PayOSLoadError || maxAttempts <= 0) {
+                console.warn('PayOS SDK not available, using demo mode');
+                callback();
+            } else {
+                setTimeout(() => waitForPayOS(callback, maxAttempts - 1), 200);
+            }
+        }
+        
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', () => {
+                waitForPayOS(loadPayOSScripts);
+            });
+        } else {
+            waitForPayOS(loadPayOSScripts);
+        }
+        
+        function loadPayOSScripts() {
+            const script = document.createElement('script');
+            script.src = 'asset/js/payos-demo.js';
+            script.onload = () => {
+                initVIPPage();
+            };
+            document.body.appendChild(script);
+        }
+        
+        // Initialize VIP page
+        function initVIPPage() {
+            const user = getCurrentUser();
+            
+            // Show/hide account link
+            const accountLink = document.getElementById('account-link');
+            if (user && accountLink) {
+                accountLink.classList.remove('hidden');
+            }
+            
+            // Check and display VIP status
+            if (user) {
+                const vipStatus = checkVipStatus();
+                const statusCard = document.getElementById('vip-status-card');
+                
+                if (vipStatus.isVip) {
+                    statusCard.classList.remove('hidden');
+                    document.getElementById('vip-days-left').textContent = vipStatus.daysLeft + ' ngày';
+                    document.getElementById('vip-expiry-date').textContent = formatDate(vipStatus.expiryDate.toISOString());
+                    
+                    if (vipStatus.daysLeft <= 7) {
+                        document.getElementById('vip-status-text').textContent = 'Sắp hết hạn';
+                    }
+                }
+            }
+            
+            // Render VIP packages
+            renderVIPPackages();
+        }
+        
+        // Render VIP packages
+        function renderVIPPackages() {
+            const container = document.getElementById('vip-packages');
+            
+            container.innerHTML = VIP_PACKAGES.map((pkg, index) => `
+                <div class="vip-card bg-surface-light dark:bg-surface-dark rounded-2xl p-6 border-2 ${
+                    pkg.popular 
+                        ? 'border-yellow-400 shadow-xl' 
+                        : 'border-border-light dark:border-border-dark'
+                } relative">
+                    ${pkg.popular ? `
+                        <div class="absolute -top-4 left-1/2 -translate-x-1/2">
+                            <span class="popular-badge inline-flex items-center gap-1 px-4 py-1 bg-yellow-400 text-slate-900 rounded-full text-xs font-bold shadow-lg">
+                                <span class="material-symbols-outlined text-sm">star</span>
+                                Phổ biến nhất
+                            </span>
+                        </div>
+                    ` : ''}
+                    
+                    <div class="text-center mb-6 ${pkg.popular ? 'mt-4' : ''}">
+                        <h3 class="text-xl font-bold text-slate-900 dark:text-white mb-2">${pkg.name}</h3>
+                        <p class="text-sm text-slate-600 dark:text-slate-400">${pkg.description}</p>
+                    </div>
+                    
+                    <div class="text-center mb-6">
+                        ${pkg.discount > 0 ? `
+                            <p class="text-sm text-slate-500 dark:text-slate-400 line-through mb-1">
+                                ${formatCurrency(pkg.originalPrice)}
+                            </p>
+                        ` : ''}
+                        <p class="text-4xl font-extrabold text-slate-900 dark:text-white mb-1">
+                            ${formatCurrency(pkg.price)}
+                        </p>
+                        ${pkg.discount > 0 ? `
+                            <span class="inline-flex items-center px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 rounded-full text-xs font-semibold">
+                                Tiết kiệm ${pkg.discount}%
+                            </span>
+                        ` : ''}
+                    </div>
+                    
+                    <div class="space-y-3 mb-6">
+                        <div class="flex items-start gap-2">
+                            <span class="material-symbols-outlined text-green-600 dark:text-green-400 text-sm mt-0.5">check_circle</span>
+                            <p class="text-sm text-slate-700 dark:text-slate-300">Ưu tiên hiển thị tin đăng</p>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <span class="material-symbols-outlined text-green-600 dark:text-green-400 text-sm mt-0.5">check_circle</span>
+                            <p class="text-sm text-slate-700 dark:text-slate-300">Huy hiệu VIP vàng</p>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <span class="material-symbols-outlined text-green-600 dark:text-green-400 text-sm mt-0.5">check_circle</span>
+                            <p class="text-sm text-slate-700 dark:text-slate-300">Hỗ trợ ưu tiên 24/7</p>
+                        </div>
+                        <div class="flex items-start gap-2">
+                            <span class="material-symbols-outlined text-green-600 dark:text-green-400 text-sm mt-0.5">check_circle</span>
+                            <p class="text-sm text-slate-700 dark:text-slate-300">Thống kê chi tiết</p>
+                        </div>
+                    </div>
+                    
+                    <button 
+                        onclick="handlePurchase('${pkg.id}')"
+                        class="w-full py-3 rounded-lg font-bold transition-all ${
+                            pkg.popular
+                                ? 'bg-yellow-400 hover:bg-yellow-500 text-slate-900 shadow-lg hover:shadow-xl'
+                                : 'bg-primary hover:bg-primary-hover text-white'
+                        }">
+                        Mua ngay
+                    </button>
+                </div>
+            `).join('');
+        }
+        
+        // Handle purchase - GIỐNG HỆT taikhoan.html
+        function handlePurchase(packageId) {
+            const user = getCurrentUser();
+            
+            if (!user) {
+                alert('Vui lòng đăng nhập để mua VIP!');
+                window.location.href = 'dangnhap.html';
+                return;
+            }
+            
+            const result = purchaseVip(packageId);
+            if (!result.success) {
+                alert(result.message);
+                return;
+            }
+            
+            // Lưu order data tạm
+            localStorage.setItem(`payos_order_${result.orderCode}`, JSON.stringify({
+                packageId: packageId,
+                orderCode: result.orderCode,
+                amount: result.package.price
+            }));
+            
+            // Hiển thị loading (simple alert hoặc có thể thêm overlay)
+            console.log('Đang tạo link thanh toán...');
+            
+            // Tạo payment link
+            createPayOSPaymentLink({
+                orderCode: result.orderCode,
+                amount: result.package.price,
+                packageId: packageId,
+                description: `Thanh toán ${result.package.name}`
+            }).then(paymentResult => {
+                if (paymentResult.success) {
+                    console.log('Redirecting to:', paymentResult.checkoutUrl);
+                    // Redirect to PayOS checkout
+                    window.location.href = paymentResult.checkoutUrl;
+                } else {
+                    alert(paymentResult.message || 'Không thể tạo link thanh toán. Vui lòng thử lại.');
+                }
+            }).catch(error => {
+                console.error('Error creating payment link:', error);
+                alert(error.message || 'Đã xảy ra lỗi. Vui lòng thử lại.');
+            });
+        }
+    </script>
+
+    <!-- Chatbot Widget -->
+    <link rel="stylesheet" href="asset/css/chatbot.css">
+    <button id="chatbot-toggle" aria-label="Mở chatbot hỗ trợ">
+        <span class="material-symbols-outlined">support_agent</span>
+    </button>
+    <div id="chatbot-container">
+        <div id="chatbot-header">
+            <h3>
+                <span class="material-symbols-outlined">smart_toy</span>
+                Trợ lý AI SpaceRent
+            </h3>
+            <button id="chatbot-close" aria-label="Đóng chatbot">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <div id="chatbot-messages"></div>
+        <div id="chatbot-input-container">
+            <textarea id="chatbot-input" placeholder="Nhập câu hỏi của bạn..." rows="1"></textarea>
+            <button id="chatbot-send" aria-label="Gửi tin nhắn">
+                <span class="material-symbols-outlined">send</span>
+            </button>
+        </div>
+    </div>
+    <script src="asset/js/chat/chatbot.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            initChatbot();
+        });
+    </script>
+</body>
+</html>
