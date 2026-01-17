@@ -11,7 +11,6 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
         rel="stylesheet" />
-    <link rel="stylesheet" href="../asset/css/chat-widget.css">
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script id="tailwind-config">
         tailwind.config = {
@@ -62,38 +61,59 @@
                     </h2>
                 </div>
                 <nav class="hidden md:flex items-center gap-8">
+                    <a onclick="goHome()" class="cursor-pointer text-sm font-semibold hover:text-primary">Trang chủ</a>
                     <a class="text-sm font-semibold hover:text-primary transition-colors" href="#">Thuê mặt bằng</a>
                     <a class="text-sm font-semibold hover:text-primary transition-colors" href="#">Cho thuê</a>
                     <a class="text-sm font-semibold hover:text-primary transition-colors" href="#">Dự án</a>
                     <a class="text-sm font-semibold hover:text-primary transition-colors" href="#">Tin tức</a>
-                    <a href="baocao.html" class="hover:text-primary flex items-center gap-1">
-                     <span class="material-symbols-outlined text-[18px]">monitoring</span>
-                     Báo cáo thống kê
-                        </a>
-                </nav>
-                <div id="guest-actions" class="flex gap-3">
-                    <button onclick="window.location.href='dangnhap.html'"
-                        class="hidden sm:flex h-9 items-center justify-center px-4 rounded-lg bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark hover:bg-slate-50 dark:hover:bg-slate-800 text-sm font-bold transition-colors text-text-main-light dark:text-text-main-dark">
-                        Đăng nhập
-                    </button>
-                    <button
-                        class="flex h-9 items-center justify-center gap-2 px-4 rounded-lg bg-primary hover:bg-primary-dark text-white text-sm font-bold transition-colors shadow-sm">
-                        <span class="material-symbols-outlined text-[18px]">add_circle</span>
-                        <span class="hidden sm:inline">Đăng tin miễn phí</span>
-                    </button>
-                </div>
-                <div id="user-actions" class="hidden items-center gap-3">
-                    <span id="user-name" class="font-semibold text-sm"></span>
+                <a onclick="loadPage('post')" class="cursor-pointer text-sm font-semibold hover:text-primary">Bài viết</a>
+             <a onclick="loadPage('profile')" class="cursor-pointer text-sm font-semibold hover:text-primary">Hồ sơ</a>
 
-                    <button id="btn-logout" class="h-9 px-4 rounded-lg border text-sm font-bold">
-                        Đăng xuất
-                    </button>
-                </div>
+                </nav>
+                <div class="flex gap-3 items-center">
+
+    <!-- NÚT ĐĂNG NHẬP -->
+    <a id="btnLogin" href="dangnhap.html"
+        class="hidden flex h-9 items-center justify-center px-4 rounded-lg
+               bg-surface-light dark:bg-surface-dark
+               border border-border-light dark:border-border-dark
+               hover:bg-slate-50 dark:hover:bg-slate-800
+               text-sm font-bold transition-colors">
+        Đăng nhập
+    </a>
+
+    <!-- USER BOX -->
+    <div id="userBox" class="hidden sm:flex items-center gap-3">
+        <span class="text-sm font-semibold">
+            Xin chào, <span id="userName"></span>
+        </span>
+        <button onclick="logout()"
+            class="h-9 px-4 rounded-lg border border-border-light
+                   hover:bg-red-50 text-sm font-bold text-red-600">
+            Đăng xuất
+        </button>
+    </div>
+
+    <!-- ĐĂNG TIN -->
+    <button
+        class="flex h-9 items-center justify-center gap-2 px-4 rounded-lg
+               bg-primary hover:bg-primary-dark text-white
+               text-sm font-bold transition-colors shadow-sm">
+        <span class="material-symbols-outlined text-[18px]">add_circle</span>
+        <span class="hidden sm:inline">Đăng tin miễn phí</span>
+    </button>
+
+</div>
 
             </div>
         </div>
     </header>
     <main class="flex-grow">
+        <!-- SPA CONTENT -->
+    <section id="spa-content" class="hidden"></section>
+
+<!-- HOME CONTENT (NỘI DUNG CŨ) -->
+    <section id="home-content">
         <section class="relative bg-slate-900 pb-24 pt-16 lg:pt-24">
             <div class="absolute inset-0 overflow-hidden">
                 <img alt="Modern office building glass facade reflecting city sky"
@@ -130,6 +150,7 @@
                             <option value="hcm">TP Hồ Chí Minh</option>
                             <option value="hn">Hà Nội</option>
                             <option value="dn">Đà Nẵng</option>
+                            <option value="bd">Bình Dương</option>
                         </select>
 
                     </div>
@@ -251,11 +272,6 @@
                 </a>
             </div>
             <div id="listing" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                <!-- Data will be loaded here -->
-                <div class="col-span-3 text-center py-10">
-                    <span class="material-symbols-outlined animate-spin text-4xl text-primary">progress_activity</span>
-                </div>
-            </div>
             </div>
             <div class="flex justify-center mt-10">
                 <div class="pagination flex gap-2"></div>
@@ -353,11 +369,66 @@
             </div>
         </div>
     </footer>
-    <script type="module" src="./asset/js/main.js"></script>
-    <script type="module" src="./asset/js/trangchu.js"></script>
-  <!-- Chat widget -->
-  <script src="../asset/js/chat-widget.js"></script>
+    <script src="asset/js/api.js"></script>
+    <script src="asset/js/render.js"></script>
+    <script src="asset/js/filter.js"></script>
+    <script src="asset/js/main.js"></script>
 
+    <script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            await fetchData();
+
+            window.PAGE_SIZE = 6;
+            window.currentPage = 1;
+
+            renderPage();
+        });
+
+        document.addEventListener("DOMContentLoaded", () => {
+            // Nút tìm kiếm chính
+            const searchBtn = document.querySelector("button[type='button'].bg-primary"); // Selector nút Tìm
+            const input = document.querySelector("input[placeholder*='Nhập quận']"); // Selector ô input
+
+            if (searchBtn && input) {
+                searchBtn.addEventListener("click", () => {
+                    const keyword = input.value.trim();
+                    // Chuyển hướng sang trang timkiem.html kèm keyword
+                    window.location.href = `timkiem.html?keyword=${encodeURIComponent(keyword)}`;
+                });
+            }
+
+           
+        });
+    </script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  onAuthStateChanged(auth, (user) => {
+    const btnLogin = document.getElementById("btnLogin");
+    const userBox = document.getElementById("userBox");
+    const userName = document.getElementById("userName");
+
+    if (user) {
+      btnLogin.classList.add("hidden");
+      userBox.classList.remove("hidden");
+      userName.innerText = user.email;
+    } else {
+      btnLogin.classList.remove("hidden");
+      userBox.classList.add("hidden");
+    }
+  });
+
+  window.logout = async () => {
+    await signOut(auth);
+    location.href = "dangnhap.html";
+  };
+</script>
+
+<script type="module" src="asset/js/router.js"></script>
 </body>
 
 </html>

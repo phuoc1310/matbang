@@ -43,10 +43,6 @@
       },
     }
   </script>
-  <script type="module" src="./asset/js/state.js"></script>
-  <script type="module" src="./asset/js/api.js"></script>
-  <script type="module" src="./asset/js/filter.js"></script>
-  <script type="module" src="./asset/js/render.js"></script>
 </head>
 
 
@@ -96,7 +92,7 @@
         <a href="Trangchu.html" class="hover:text-primary">Trang chủ</a> /
         <span>Thuê</span> /
         <span id="bc-region"></span> /
-        <span id="breadcrumb-city" class="font-medium text-slate-900"></span>
+        <span id="bc-district" class="font-medium text-slate-900"></span>
       </nav>
       <div class="w-full md:w-[400px]">
         <div id="searchBox"
@@ -106,7 +102,7 @@
           </div>
           <input
             class="peer h-full w-full outline-none text-sm text-slate-700 dark:text-slate-200 pr-2 bg-transparent placeholder-slate-400"
-            id="search" placeholder="Tìm kiếm theo khu vực, tên đường..." type="text" value="" />
+            id="search" placeholder="Tìm kiếm theo khu vực, tên đường..." type="text" value="Quận 1, TP.HCM" />
           <button
             class="grid place-items-center h-full w-10 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors">
             <span class="material-symbols-outlined text-[20px]">close</span>
@@ -155,7 +151,7 @@
                 <span class="text-slate-400 self-center">-</span>
                 <input id="maxPrice"
                   class="w-full text-sm p-2 rounded border border-border-light dark:border-border-dark bg-slate-50 dark:bg-slate-800 text-center text-slate-700 dark:text-slate-200"
-                  type="text" value="20,000,000,000" />
+                  type="text" value="35,000,000" />
               </div>
             </div>
           </details>
@@ -181,7 +177,7 @@
               </label>
               <label class="flex items-center gap-3 cursor-pointer group/item">
                 <div class="relative flex items-center">
-                  <input data-area="30-50"
+                  <input checked="" data-area="30-50"
                     class="peer size-4 appearance-none rounded border border-slate-300 dark:border-slate-600 checked:bg-primary checked:border-primary transition-all"
                     type="checkbox" />
                   <span
@@ -273,7 +269,7 @@
             <div class="pt-2 pb-4 space-y-2">
               <label class="flex items-center gap-3 cursor-pointer group/item">
                 <div class="relative flex items-center">
-                  <input
+                  <input checked=""
                     class="peer size-4 appearance-none rounded border border-slate-300 dark:border-slate-600 checked:bg-primary checked:border-primary transition-all"
                     type="checkbox" />
                   <span
@@ -297,7 +293,7 @@
               </label>
               <label class="flex items-center gap-3 cursor-pointer group/item">
                 <div class="relative flex items-center">
-                  <input
+                  <input checked=""
                     class="peer size-4 appearance-none rounded border border-slate-300 dark:border-slate-600 checked:bg-primary checked:border-primary transition-all"
                     type="checkbox" />
                   <span
@@ -320,7 +316,7 @@
         <!-- Results Header -->
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <h2 class="text-2xl font-bold text-slate-900 dark:text-white">
-            <span id="resultTitle" class="text-primary">Kết quả</span>
+            <span class="text-primary"></span>
           </h2>
           <div class="flex items-center gap-2">
             <span class="text-sm text-slate-500 whitespace-nowrap">Sắp xếp theo:</span>
@@ -346,116 +342,35 @@
       </div>
     </div>
   </main>
-  <!-- CHỈ 1 dòng này ở cuối body -->
-
+  <script src="asset/js/api.js"></script>
+  <script src="asset/js/state.js"></script>
+  <script src="asset/js/render.js"></script>
+  <script src="asset/js/filter.js"></script>
+  <script src="asset/js/main.js"></script>
 
 </body>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const params = new URLSearchParams(window.location.search);
+    const keyword = params.get("keyword");
 
-<!-- Dán đè vào phần Script cuối file timkiem.html -->
-<script type="module">
-  import { fetchAllData } from "./asset/js/api.js";
-  import { applyFilter } from "./asset/js/filter.js";
-  import { renderPage } from "./asset/js/render.js";
+    const regionEl = document.getElementById("bc-region");
+    const districtEl = document.getElementById("bc-district");
 
-  document.addEventListener("DOMContentLoaded", async () => {
-    console.log("🚀 Timkiem page loaded");
-    
-    try {
-      // 1. Đọc URL Params
-      const params = new URLSearchParams(window.location.search);
-      const city = params.get("city") || "hcm";
-      const keyword = params.get("keyword") || "";
+    if (!keyword) return;
 
-      console.log("📍 Params:", { city, keyword });
+    const decoded = decodeURIComponent(keyword).trim();
 
-      // 2. Map mã khu vực Chợ Tốt (chỉ để hiển thị)
-      let regionName = "TP.HCM";
-      if (city === "hn") { regionName = "Hà Nội"; }
-      else if (city === "dn") { regionName = "Đà Nẵng"; }
-      else if (city === "bd") { regionName = "Bình Dương"; }
-
-      // 3. Điền dữ liệu vào UI
-      const searchInput = document.getElementById("search");
-      if (searchInput) searchInput.value = keyword;
-
-      const bcRegion = document.getElementById("bc-region");
-      if (bcRegion) bcRegion.textContent = regionName;
-
-      const resultTitle = document.querySelector("h2 span.text-primary");
-      if (resultTitle) resultTitle.textContent = `Kết quả tại ${regionName}`;
-
-      // 4. Setup State
-      window.__SEARCH_STATE__ = { 
-        keyword: keyword,
-        city: city,
-        minPrice: 0,
-        maxPrice: 20000000000
-      };
-      window.PAGE_SIZE = 9;
-      window.currentPage = 1;
-
-      // UI Loading
-      const listingEl = document.getElementById("listing");
-      if (listingEl) {
-        listingEl.innerHTML = `
-          <div class="col-span-3 text-center py-20">
-            <span class="material-symbols-outlined animate-spin text-5xl text-primary">progress_activity</span>
-            <p class="mt-4 text-slate-500">Đang tìm kiếm mặt bằng phù hợp...</p>
-          </div>`;
-      }
-
-      // 5. Gọi API & Render
-      console.log(`📥 Fetching data for keyword: "${keyword}"`);
-      
-      await fetchAllData(3, keyword);
-      
-      console.log("✅ Raw data loaded:", window.rawData?.length, "items");
-      
-      // Kiểm tra dữ liệu
-      if (window.rawData && window.rawData.length > 0) {
-        console.log("📋 Sample item:", window.rawData[0]);
-        console.log("🏙️ Item regionCode:", window.rawData[0].regionCode);
-        
-        // Áp dụng filter
-        applyFilter();
-      } else {
-        console.warn("⚠️ No data from API");
-        if (listingEl) {
-          listingEl.innerHTML = `
-            <div class="col-span-3 text-center py-20">
-              <span class="material-symbols-outlined text-5xl text-gray-400">search_off</span>
-              <p class="mt-4 text-gray-600">Không tìm thấy mặt bằng nào</p>
-              <p class="text-sm text-gray-500 mt-2">Hãy thử tìm kiếm với từ khóa khác</p>
-            </div>`;
-        }
-      }
-
-      // 6. Gán sự kiện
-      const applyBtn = document.getElementById("applyFilterBtn");
-      if (applyBtn) {
-        applyBtn.addEventListener("click", applyFilter);
-      }
-
-      if (searchInput) {
-        searchInput.addEventListener("keyup", (e) => {
-          if (e.key === "Enter") applyFilter();
-        });
-      }
-
-    } catch (error) {
-      console.error("❌ Error loading data:", error);
-      const listingEl = document.getElementById("listing");
-      if (listingEl) {
-        listingEl.innerHTML = `
-          <div class="col-span-3 text-center py-20 text-red-500">
-            <span class="material-symbols-outlined text-5xl">error</span>
-            <p class="mt-4 font-semibold">Đã xảy ra lỗi khi tải dữ liệu</p>
-            <p class="text-sm mt-2">${error.message}</p>
-            <button onclick="location.reload()" class="mt-4 px-4 py-2 bg-primary text-white rounded-lg">
-              Thử lại
-            </button>
-          </div>`;
-      }
+    // Nếu có dấu phẩy → "Quận 1, TP Hồ Chí Minh"
+    if (decoded.includes(",")) {
+      const parts = decoded.split(",").map(s => s.trim());
+      if (districtEl) districtEl.textContent = parts[0];
+      if (regionEl) regionEl.textContent = parts[1];
+    }
+    // Nếu chỉ có 1 từ → "Hà Nội", "Tây Hồ"
+    else {
+      if (districtEl) districtEl.textContent = "";
+      if (regionEl) regionEl.textContent = decoded;
     }
   });
 </script>

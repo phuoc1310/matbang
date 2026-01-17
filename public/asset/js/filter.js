@@ -1,50 +1,30 @@
-import { renderPage } from "./render.js";
-import { runBIAnalysis } from "./bi/biProcessor.js";
-import { getInterestCountMap } from "./auth/firebaseService.js";
-
-/* ================= UTILS ================= */
+/* ================= TEXT NORMALIZE (QUAN TRỌNG) ================= */
+// bỏ dấu + lowerCase để so chuỗi tiếng Việt
 function normalizeText(s = "") {
   return s
     .toLowerCase()
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .trim();
+    .replace(/[\u0300-\u036f]/g, "");
 }
 
+/* ================= TIỀN TỆ ================= */
 function parseMoney(v) {
   return Number(String(v || "").replace(/[^\d]/g, "")) || 0;
 }
 
-/* ================= CITY MAP ================= */
-const CITY_KEYWORDS = {
-  hn: ["ha noi", "hn"],
-  hcm: ["ho chi minh", "tphcm", "tp hcm", "hcm"],
-  dn: ["da nang", "dn"],
-  bd: ["binh duong", "bd"],
-};
-
-function detectCityFromKeyword(keyword) {
-  for (const [code, keys] of Object.entries(CITY_KEYWORDS)) {
-    if (keys.some(k => keyword.includes(k))) return code;
-  }
-  return "";
+function formatMoney(n) {
+  return Number(n || 0).toLocaleString("en-US");
 }
 
 /* ================= COLLECT FILTER ================= */
 function collectFilterState() {
-  const state = window.__SEARCH_STATE__ || {};
-  const rawKeyword =
-    document.getElementById("search")?.value || state.keyword || "";
-
-  const keyword = normalizeText(rawKeyword);
-  const detectedCity = detectCityFromKeyword(keyword);
-
   return {
-    keyword,
-    city: detectedCity || state.city || "",
+    keyword: normalizeText(
+      document.getElementById("search")?.value || ""
+    ),
+    city: document.getElementById("citySelect")?.value || "",
     minPrice: parseMoney(document.getElementById("minPrice")?.value),
-    maxPrice:
-      parseMoney(document.getElementById("maxPrice")?.value) || Infinity,
+    maxPrice: parseMoney(document.getElementById("maxPrice")?.value) || 9e18,
     areas: Array.from(
       document.querySelectorAll("input[data-area]:checked")
     ).map(cb => cb.dataset.area),
@@ -52,57 +32,57 @@ function collectFilterState() {
 }
 
 /* ================= APPLY FILTER ================= */
-/* ================= APPLY FILTER ================= */
-export async function applyFilter() {
-  console.log("🔄 Applying filter...");
-
-  if (!location.pathname.includes("timkiem")) {
-    window.filteredData = window.rawData || [];
-    if (window.renderPage) window.renderPage();
-    return;
-  }
-
-  if (!window.rawData || !Array.isArray(window.rawData)) {
-    console.warn("No raw data available");
-    window.filteredData = [];
-    if (window.renderPage) window.renderPage();
+function applyFilter() {
+  if (!Array.isArray(window.rawData)) {
+    console.warn("rawData chưa sẵn sàng");
     return;
   }
 
   const f = collectFilterState();
-  console.log("📋 Filter state:", f);
 
-  window.__SEARCH_STATE__ = {
-    keyword: f.keyword,
-    city: f.city,
-  };
+  window.filteredData = window.rawData.filter(item => {
 
-  /* ===== 1. FILTER DATA ===== */
-  let filtered = window.rawData.filter(item => {
-    const region = normalizeText(item.region || "");
-
-    // CITY
+    /* ===== CITY ===== */
     if (f.city) {
-      const allow = CITY_KEYWORDS[f.city] || [];
+      const region = normalizeText(item.region || "");
+
+      const cityMap = {
+        hcm: ["ho chi minh", "tp ho chi minh", "hcm"],
+        hn: ["ha noi"],
+        dn: ["da nang"],
+        bd: ["binh duong"],
+      };
+
+      const allow = cityMap[f.city] || [];
       if (!allow.some(k => region.includes(k))) return false;
     }
 
-    // KEYWORD
+    /* ===== KEYWORD ===== */
     if (f.keyword) {
-      const text = normalizeText(
-        `${item.title} ${item.street} ${item.ward} ${item.district} ${item.region}`
-      );
+      const text = normalizeText(`
+        ${item.title || ""}
+        ${item.street || ""}
+        ${item.ward || ""}
+        ${item.district || ""}
+        ${item.region || ""}
+      `);
+
       if (!text.includes(f.keyword)) return false;
     }
 
-    // PRICE
-    const price = item.price || 0;
+    /* ===== PRICE ===== */
+    const price =
+      Number(item.price) ||
+      parseMoney(item.price_string) ||
+      parseMoney(item.price_text);
+
     if (price < f.minPrice || price > f.maxPrice) return false;
 
-    // AREA
+    /* ===== AREA ===== */
     if (f.areas.length) {
-      const area = item.area_m2 || 0;
+      const area = Number(item.area_m2) || 0;
       let ok = false;
+
       for (const a of f.areas) {
         if (a === "0-30" && area < 30) ok = true;
         if (a === "30-50" && area >= 30 && area <= 50) ok = true;
@@ -115,60 +95,37 @@ export async function applyFilter() {
     return true;
   });
 
-  console.log(`✅ Filtered: ${filtered.length} items`);
+  window.currentPage = 1;
+  renderPage?.();
+}
 
-  /* ===== 2. BI SCORING ===== */
-  const isUserSearching =
-    document.activeElement?.id === "search" ||
-    location.pathname.includes("timkiem");
+/* ================= PRICE INPUT ================= */
+document.addEventListener("DOMContentLoaded", () => {
+  const minEl = document.getElementById("minPrice");
+  const maxEl = document.getElementById("maxPrice");
+  if (!minEl || !maxEl) return;
 
-  if (filtered.length === 0) {
-    window.filteredData = [];
-  } else if (!isUserSearching) {
-    window.filteredData = filtered.map(item => ({
-      ...item,
-      score: 0.5,
-      level: "Bình thường"
-    }));
-  } else {
-    // Tạo searchContext đúng format
-    const searchContext = {
-      minPrice: f.minPrice,
-      maxPrice: f.maxPrice,
-      avgPrice: (f.minPrice + f.maxPrice) / 2 || 0,
-      avgArea: 50,
-      city: f.city || null
-    };
+  const sync = () => applyFilter();
 
-    console.log("🎯 Running BI Analysis with context:", searchContext);
+  minEl.addEventListener("input", sync);
+  maxEl.addEventListener("input", sync);
 
-    const biResult = runBIAnalysis(filtered, searchContext);
-    const biMap = new Map(biResult.map(x => [x.id, x]));
-
-    window.filteredData = filtered.map(item => ({
-      ...item, // 🔥 GIỮ image, title, seller
-      score: biMap.get(item.id)?.score ?? 0.5,
-      level: biMap.get(item.id)?.level ?? "Bình thường"
-    }));
-    const interestMap = await getInterestCountMap();
-
-    filtered = filtered.map(item => ({
-      ...item,
-      interests: interestMap[item.id] || 0
-    }));
-
-    /* ===== 3. RENDER ===== */
-    window.currentPage = 1;
-    if (window.renderPage) {
-      renderPage();
-    }
-  }
-
-  /* ================= EVENTS ================= */
-  document.addEventListener("DOMContentLoaded", () => {
-    document.getElementById("search")?.addEventListener("input", applyFilter);
-    document
-      .getElementById("applyFilterBtn")
-      ?.addEventListener("click", applyFilter);
+  minEl.addEventListener("blur", () => {
+    minEl.value = formatMoney(parseMoney(minEl.value));
   });
-};
+
+  maxEl.addEventListener("blur", () => {
+    maxEl.value = formatMoney(parseMoney(maxEl.value));
+  });
+});
+
+/* ================= CITY SELECT ================= */
+document.addEventListener("DOMContentLoaded", () => {
+  const citySelect = document.getElementById("citySelect");
+  if (!citySelect) return;
+
+  citySelect.addEventListener("change", () => {
+    window.currentPage = 1;
+    applyFilter();
+  });
+});
